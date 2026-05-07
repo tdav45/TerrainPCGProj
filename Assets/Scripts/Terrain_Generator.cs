@@ -32,10 +32,14 @@ public class Terrain_Generator_Editor : Editor
 [RequireComponent(typeof(MeshCollider))]
 public class Terrain_Generator : MonoBehaviour
 {
+
+    [SerializeField]
+    private Material grassMaterial;
+    
+    //Terrian mesh settings
     [Tooltip("Curve controls the range of height of the terrain")]
     [SerializeField]
     private AnimationCurve heightCurve;
-
     [Tooltip("Size of the terrain in the X axis")]
     [SerializeField]
     private int terrainX = 100;
@@ -62,10 +66,15 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Lacunarity for the noise, higher values will create more detailed terrain")]
     [SerializeField]
     private float lacunarity = 2f;
+    [Tooltip("Height threshold for the terrain, any height below this value will be set to 0")]
+    [SerializeField]
+    private float lowerThreshold = 0.04f;
+
 
     private Vector3[] vertices;
     private int[] triangles;
     private Mesh mesh;
+
 
 
 
@@ -135,6 +144,9 @@ public class Terrain_Generator : MonoBehaviour
             {
                 // Assign and set height of each vertices
                 float noiseHeight = GenerateNoiseHeight(z, x, octaveOffsets);
+                if (noiseHeight <= lowerThreshold)
+                    noiseHeight = 0;
+
                 vertices[i] = new Vector3(x, noiseHeight, z);
                 i++;
             }
@@ -175,9 +187,8 @@ public class Terrain_Generator : MonoBehaviour
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
         GetComponent<MeshCollider>().sharedMesh = mesh;
-
         gameObject.transform.localScale = new Vector3(terrainScale, terrainScale, terrainScale);
-
+        GetComponent<MeshRenderer>().material = grassMaterial;
     }
 
 
@@ -195,6 +206,7 @@ public class Terrain_Generator : MonoBehaviour
         CreateMeshShape();
         CreateTriangles();
         UpdateMesh();
+        
 
     }
 
