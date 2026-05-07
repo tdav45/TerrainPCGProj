@@ -35,15 +35,18 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Curve controls the range of height of the terrain")]
     [SerializeField]
     private AnimationCurve heightCurve;
-    [Tooltip("Number of layers of noise to add detail to the terrain")]
-    [SerializeField] 
-    private int octaves = 4;
+
     [Tooltip("Size of the terrain in the X axis")]
     [SerializeField]
     private int terrainX = 100;
     [Tooltip("Size of the terrain in the Z axis")]
     [SerializeField]
     private int terrainZ = 100;
+    [SerializeField]
+    private int terrainScale = 100;
+    [Tooltip("Number of layers of noise to add detail to the terrain")]
+    [SerializeField]
+    private int octaves = 4;
     [Tooltip("Controls the frequency of the noise, higher values will create more detailed terrain")]
     [SerializeField]
     private float scale = 20f;
@@ -170,9 +173,10 @@ public class Terrain_Generator : MonoBehaviour
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
+        mesh.RecalculateBounds();
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
-        gameObject.transform.localScale = new Vector3(500, 500, 500);
+        gameObject.transform.localScale = new Vector3(terrainScale, terrainScale, terrainScale);
 
     }
 
