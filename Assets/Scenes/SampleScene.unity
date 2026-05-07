@@ -166,11 +166,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9441985f7fbb39b449769fe1912cbfb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Terrain_Generator
-  octaves: 4
+  heightCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  octaves: 5
   terrainX: 100
   terrainZ: 100
-  scale: 20
-  seed: 617
+  scale: 30
+  seed: 1
+  baseFrequency: 1
+  basePersistence: 0.5
+  lacunarity: 2
 --- !u!64 &24418427
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -192,7 +219,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1647506335}
+  m_Mesh: {fileID: 1396651588}
 --- !u!23 &24418428
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -249,7 +276,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 24418423}
-  m_Mesh: {fileID: 1647506335}
+  m_Mesh: {fileID: 1396651588}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,7 +590,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!43 &1647506335
+--- !u!43 &1396651588
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -714,8 +741,8 @@ Mesh:
       m_BitSize: 0
     m_UVInfo: 0
   m_LocalAABB:
-    m_Center: {x: 50, y: -0.0683732, z: 50}
-    m_Extent: {x: 50, y: 1.0738058, z: 50}
+    m_Center: {x: 50, y: 6.0145054, z: 50}
+    m_Extent: {x: 50, y: 6.0145054, z: 50}
   m_MeshUsageFlags: 0
   m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 

@@ -32,25 +32,42 @@ public class Terrain_Generator_Editor : Editor
 [RequireComponent(typeof(MeshCollider))]
 public class Terrain_Generator : MonoBehaviour
 {
+    [Tooltip("Curve controls the range of height of the terrain")]
+    [SerializeField]
+    private AnimationCurve heightCurve;
+    [Tooltip("Number of layers of noise to add detail to the terrain")]
     [SerializeField] 
     private int octaves = 4;
+    [Tooltip("Size of the terrain in the X axis")]
     [SerializeField]
     private int terrainX = 100;
+    [Tooltip("Size of the terrain in the Z axis")]
     [SerializeField]
     private int terrainZ = 100;
+    [Tooltip("Controls the frequency of the noise, higher values will create more detailed terrain")]
     [SerializeField]
     private float scale = 20f;
+    [Tooltip("Seed for random number generator, changing this will create a different terrain")]
     [SerializeField]
     private int seed = 0;
-
+    [Tooltip("Base frequency for the noise, higher values will create more detailed terrain")]
+    [SerializeField]
+    private float baseFrequency = 1f;
+    [Tooltip("Base persistence for the noise, higher values will create more rugged terrain")]
+    [SerializeField]
+    private float basePersistence = 0.5f;
+    [Tooltip("Lacunarity for the noise, higher values will create more detailed terrain")]
+    [SerializeField]
+    private float lacunarity = 2f;
 
     private Vector3[] vertices;
     private int[] triangles;
     private Mesh mesh;
 
 
-   
-    
+
+
+
     //Get the offset seed for each octave
     private Vector2[] GetOffsetSeed()
     {
@@ -71,10 +88,12 @@ public class Terrain_Generator : MonoBehaviour
     }
     private float GenerateNoiseHeight(float x, float z, Vector2[] offsetSeed)
     {
-        float amplitude = 2f;
-        float frequency = 1f;
+        float frequency = baseFrequency;
+        float persistence = basePersistence;
+        float amplitude = 12;
 
-        float noiseValue = 0f; 
+        float noiseValue = 0f;
+        float heightValue = 0;
 
         //loop through each octave and calculate the noise value
         for (int i = 0; i < octaves; i++)
@@ -83,12 +102,14 @@ public class Terrain_Generator : MonoBehaviour
             float sampleX = x / scale * frequency + offsetSeed[i].x;
 
 
-            noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
-            amplitude *= 0.5f; // Reduce amplitude for next octave
-            frequency *= 2f; // Increase frequency for next octave
+            noiseValue = (Mathf.PerlinNoise(sampleZ, sampleX)) * 2 - 1;
+            heightValue += heightCurve.Evaluate(noiseValue) * amplitude;
+
+            amplitude *= persistence; // Decrease amplitude for next octave
+            frequency *= lacunarity; // Increase frequency for next octave
 
         }
-        return noiseValue; 
+        return heightValue; 
     }
     private void AssignMesh()
     {
