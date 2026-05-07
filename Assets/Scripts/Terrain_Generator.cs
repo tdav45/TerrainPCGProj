@@ -69,27 +69,30 @@ public class Terrain_Generator : MonoBehaviour
 
         return offsetSeed;
     }
-    private float GetNoiseHeight(float x, float z, Vector2[] offsetSeed)
+    private float GenerateNoiseHeight(float x, float z, Vector2[] offsetSeed)
     {
-        float noiseValue = 0f;
-        float amplitude = 12f;
+        float amplitude = 2f;
         float frequency = 1f;
+
+        float noiseValue = 0f; 
 
         //loop through each octave and calculate the noise value
         for (int i = 0; i < octaves; i++)
         {
-            float sampleX = x / scale * frequency + offsetSeed[i].x;
             float sampleZ = z / scale * frequency + offsetSeed[i].y;
+            float sampleX = x / scale * frequency + offsetSeed[i].x;
 
-            noiseValue += Mathf.PerlinNoise(sampleX, sampleZ) * amplitude;
+
+            noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
             amplitude *= 0.5f; // Reduce amplitude for next octave
             frequency *= 2f; // Increase frequency for next octave
+
         }
-        return noiseValue; // Normalize the result
+        return noiseValue; 
     }
     private void AssignMesh()
     {
-        if (!mesh)
+        if (mesh == null)
         {
             mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = mesh;
@@ -97,16 +100,18 @@ public class Terrain_Generator : MonoBehaviour
     }
     private void CreateMeshShape()
     {
-        Vector2[] offsetSeed = GetOffsetSeed();
+        Vector2[] octaveOffsets = GetOffsetSeed();
 
         
         vertices = new Vector3[(terrainX + 1) * (terrainZ + 1)];
-        for (int i = 0; i < terrainZ; i++)
+
+        for (int i = 0, z = 0; z <= terrainZ; z++)
         {
-            for (int j = 0; j < terrainX; j++)
+            for (int x = 0; x <= terrainX; x++)
             {
-                float noiseValue = GetNoiseHeight(i, j, offsetSeed); // Set the height of the terrain at (x, y) based on the noise value
-                vertices[i] = new Vector3(i, noiseValue, j);
+                // Assign and set height of each vertices
+                float noiseHeight = GenerateNoiseHeight(z, x, octaveOffsets);
+                vertices[i] = new Vector3(x, noiseHeight, z);
                 i++;
             }
         }
@@ -145,6 +150,9 @@ public class Terrain_Generator : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         GetComponent<MeshCollider>().sharedMesh = mesh;
+
+        gameObject.transform.localScale = new Vector3(500, 500, 500);
+
     }
 
 
