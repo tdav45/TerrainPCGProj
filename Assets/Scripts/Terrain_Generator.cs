@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
+//GUI//
 [CustomEditor(typeof(Terrain_Generator))]
 public class Terrain_Generator_Editor : Editor
 {
@@ -27,6 +28,8 @@ public class Terrain_Generator_Editor : Editor
 
     }
 }
+
+//TERRAIN GENERATION//
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
@@ -46,6 +49,9 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Size of the terrain in the Z axis")]
     [SerializeField]
     private int terrainZ = 100;
+    
+    //NOISE SETTINGS//
+
     [SerializeField]
     private int terrainScale = 100;
     [Tooltip("Number of layers of noise to add detail to the terrain")]
@@ -57,6 +63,11 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Seed for random number generator, changing this will create a different terrain")]
     [SerializeField]
     private int seed = 0;
+
+    [Tooltip("Base amplitude, scales the height of the terrain, higher values will create taller terrain")]
+    [SerializeField]
+    private float baseAmplitude;
+
     [Tooltip("Base frequency for the noise, higher values will create more detailed terrain")]
     [SerializeField]
     private float baseFrequency = 1f;
@@ -69,6 +80,15 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Height threshold for the terrain, any height below this value will be set to 0")]
     [SerializeField]
     private float lowerThreshold = 0.04f;
+
+    //MATERIAL VARIABLES//
+
+
+    private Color[] colours;
+    [SerializeField] private Gradient gradient;
+
+    private float minTerrainheight;
+    private float maxTerrainheight;
 
 
     private Vector3[] vertices;
@@ -102,7 +122,7 @@ public class Terrain_Generator : MonoBehaviour
     {
         float frequency = baseFrequency;
         float persistence = basePersistence;
-        float amplitude = 12;
+        float amplitude = baseAmplitude;
 
         float noiseValue = 0f;
         float heightValue = 0;
@@ -123,6 +143,16 @@ public class Terrain_Generator : MonoBehaviour
         }
         return heightValue; 
     }
+
+    private void SetMinMaxHeights(float noiseHeight)
+    {
+        // Set min and max height of map for color gradient
+        if (noiseHeight > maxTerrainheight)
+            maxTerrainheight = noiseHeight;
+        if (noiseHeight < minTerrainheight)
+            minTerrainheight = noiseHeight;
+    }
+
     private void AssignMesh()
     {
         if (mesh == null)
@@ -145,8 +175,9 @@ public class Terrain_Generator : MonoBehaviour
                 // Assign and set height of each vertices
                 float noiseHeight = GenerateNoiseHeight(z, x, octaveOffsets);
                 if (noiseHeight <= lowerThreshold)
-                    noiseHeight = 0;
-
+                    noiseHeight = 0;           
+              
+                SetMinMaxHeights(noiseHeight);
                 vertices[i] = new Vector3(x, noiseHeight, z);
                 i++;
             }
@@ -178,14 +209,31 @@ public class Terrain_Generator : MonoBehaviour
             vert++;
         }
     }
+
+    private void ColourTerrain()
+    {
+        colours = new Color[vertices.Length];
+
+        // Loop over vertices and apply a color from the depending on height (y axis value)
+        for (int i = 0, z = 0; z < vertices.Length; z++)
+        {
+            float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
+            colours[i] = gradient.Evaluate(height);
+            i++;
+        }
+
+    }
+
     private void UpdateMesh()
     {   
         ClearMesh();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+        mesh.colors = colours;
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
+
         GetComponent<MeshCollider>().sharedMesh = mesh;
         gameObject.transform.localScale = new Vector3(terrainScale, terrainScale, terrainScale);
         GetComponent<MeshRenderer>().material = grassMaterial;
@@ -200,15 +248,18 @@ public class Terrain_Generator : MonoBehaviour
     {
         if (mesh) mesh.Clear();
     }
+    
+   //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain()
     {
         AssignMesh();
         CreateMeshShape();
         CreateTriangles();
+        ColourTerrain();
         UpdateMesh();
         
 
     }
 
-    
+
 }
