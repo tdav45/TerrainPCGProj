@@ -154,9 +154,10 @@ public class Terrain_Generator : MonoBehaviour
     }
 
     private void AssignMesh()
-    {
+    { 
         if (mesh == null)
         {
+            Debug.Log("Creating new mesh");
             mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = mesh;
         }
@@ -183,6 +184,7 @@ public class Terrain_Generator : MonoBehaviour
             }
         }
     }
+
     private void CreateTriangles()
     {
         // Need 6 vertices to create a square (2 triangles)
@@ -233,6 +235,7 @@ public class Terrain_Generator : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
+        mesh.name = "terrain_mesh";
 
         GetComponent<MeshCollider>().sharedMesh = mesh;
         gameObject.transform.localScale = new Vector3(terrainScale, terrainScale, terrainScale);
