@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Default_noise_settings
   m_EditorClassIdentifier: Assembly-CSharp::Noise_Settings
   octaves: 4
-  seed: 49
+  seed: 1
   scale: 20
-  baseAmplitude: 1
+  baseAmplitude: 6
   baseFrequency: 1
   basePersistence: 0.5
   lacunarity: 2
