@@ -80,10 +80,13 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField] 
     private GameObject terrainChunkPrefab;
     [SerializeField]
-    private int chunkX, chunkY;
-    
+    int gridSize = 10;
+
+
     public Terrain_Generation_Settings terrain;
     public Noise_Settings noise;
+
+    private bool isGenerating = false;
 
 
     //Get the offset seed for each octave
@@ -114,22 +117,43 @@ public class Terrain_Generator : MonoBehaviour
     //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain()
     {
-        /*        AssignMesh();
-                CreateMeshShape();
-                CreateTriangles();
-                ColourTerrain();
-                UpdateMesh();*/
-
-        var chunk = Instantiate(terrainChunkPrefab);
-
-        int xCor = 1, zCor = 1;
-        
-        if ( chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(noise, terrain,
-            GetOffsetSeed(), chunkX, chunkY))
+        if (isGenerating == false)
         {
-            Debug.Log("New Chunk generated at: " + chunkX + " "+ chunkY);
+            isGenerating = true;
+
+            GameObject terrainHolder = Instantiate(new GameObject("Terrain_Holder"));
+
+            //Generate grid
+            for (int i = 0; i < gridSize; i++)
+            {
+                for (int j = 0; j < gridSize; j++)
+                {
+                    NewChunk(i, j, terrainHolder);
+                }
+
+
+            }
+
+            isGenerating = false;
         }
-    
+        else
+        {
+            Debug.LogError("Already Generating");
+        }
+
+
+    }
+
+    private void NewChunk(int x, int z, GameObject parent)
+    {
+        var chunk = Instantiate(terrainChunkPrefab);
+        chunk.transform.parent = parent.transform;
+
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(noise, terrain,
+            GetOffsetSeed(), x, z))
+        {
+            Debug.Log("New Chunk generated at: " + x + " " + z);
+        }
     }
 
 
