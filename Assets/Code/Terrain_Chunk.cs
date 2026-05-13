@@ -151,6 +151,10 @@ public class Terrain_Chunk : MonoBehaviour
             terrain.scale,
             terrain.scale);
 
+        //Offset chunk position
+        transform.position = new Vector3(chunkX * terrain.sizeX * terrain.scale, 0,
+            chunkZ * terrain.sizeZ * terrain.scale);  
+
         GetComponent<MeshRenderer>().material = terrain.material;
     }
 

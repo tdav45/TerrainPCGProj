@@ -164,6 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Terrain_Generator
   terrainChunkPrefab: {fileID: 8521705488632762623, guid: a3a58fa078d4ca146b967595f8f20b5a, type: 3}
+  chunkX: 0
+  chunkY: 0
   terrain: {fileID: 11400000, guid: fc2e9ef01414bea4d9da8e9ff565bb4c, type: 2}
   noise: {fileID: 11400000, guid: b6ae62d4709d65b4d9388e6f437c9a86, type: 2}
 --- !u!1 &330585543
@@ -410,7 +412,7 @@ Transform:
   m_GameObject: {fileID: 367619288}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -62, z: 0}
+  m_LocalPosition: {x: 0, y: -5.1, z: 0}
   m_LocalScale: {x: 256.24307, y: 25.504164, z: 256.24307}
   m_ConstrainProportionsScale: 1
   m_Children: []

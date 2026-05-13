@@ -24,15 +24,7 @@ public class Terrain_Generator_Editor : Editor
     }
 }
 
-
-
-
-
-
-
-
 //TERRAIN GENERATION//
-
 public class Terrain_Generator : MonoBehaviour
 {
 
@@ -81,17 +73,17 @@ public class Terrain_Generator : MonoBehaviour
     [Tooltip("Height threshold for the terrain, any height below this value will be set to 0")]
     [SerializeField]
     private float lowerThreshold = 0.04f;*/
-
-
     // [SerializeField] private Gradient gradient;
 
-    [SerializeField] private GameObject terrainChunkPrefab;
+
+
+    [SerializeField] 
+    private GameObject terrainChunkPrefab;
+    [SerializeField]
+    private int chunkX, chunkY;
     
     public Terrain_Generation_Settings terrain;
     public Noise_Settings noise;
-
-
-
 
 
     //Get the offset seed for each octave
@@ -133,9 +125,9 @@ public class Terrain_Generator : MonoBehaviour
         int xCor = 1, zCor = 1;
         
         if ( chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(noise, terrain,
-            GetOffsetSeed(), xCor, zCor))
+            GetOffsetSeed(), chunkX, chunkY))
         {
-            Debug.Log("New Chunk generated at: " + xCor + " "+ zCor);
+            Debug.Log("New Chunk generated at: " + chunkX + " "+ chunkY);
         }
     
     }
