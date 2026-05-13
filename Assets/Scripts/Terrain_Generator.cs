@@ -33,8 +33,8 @@ public struct Terrain_Generation_Settings
 {
     public Material material;
     public AnimationCurve heightCurve;
-    public int terrainX, terrainZ; //Size of terrain along each axis
-    public int terrainScale; //Scale multiplier
+    public int sizeX, sizeZ; //Size of terrain along each axis
+    public int scale; //Scale multiplier
     public Gradient gradient; //Colour gradient that applies to the material
 }
 
@@ -61,7 +61,8 @@ public struct Noise_Settings
 public class Terrain_Generator : MonoBehaviour
 {
 
-    /*[SerializeField]
+    /*Old variables
+     * [SerializeField]
     private Material grassMaterial;
     
     //Terrian mesh settings
@@ -109,8 +110,8 @@ public class Terrain_Generator : MonoBehaviour
 
     // [SerializeField] private Gradient gradient;
 
-    public Terrain_Generation_Settings terrainSettings;
-    public Noise_Settings noiseSettings;
+    public Terrain_Generation_Settings terrain;
+    public Noise_Settings nosie;
 
     private Color[] colours;
 
@@ -131,12 +132,12 @@ public class Terrain_Generator : MonoBehaviour
     //Get the offset seed for each octave
     private Vector2[] GetOffsetSeed()
     {
-        Vector2[] offsetSeed = new Vector2[noiseSettings.octaves];
+        Vector2[] offsetSeed = new Vector2[nosie.octaves];
 
-        System.Random prng = new System.Random(noiseSettings.seed);
+        System.Random prng = new System.Random(nosie.seed);
 
 
-        for (int i = 0; i < noiseSettings.octaves; i++)
+        for (int i = 0; i < nosie.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000);
             float offsetY = prng.Next(-100000, 100000);
@@ -148,25 +149,25 @@ public class Terrain_Generator : MonoBehaviour
     }
     private float GenerateNoiseHeight(float x, float z, Vector2[] offsetSeed)
     {
-        float frequency = noiseSettings.baseFrequency;
-        float persistence = noiseSettings.basePersistence;
-        float amplitude = noiseSettings.baseAmplitude;
+        float frequency = nosie.baseFrequency;
+        float persistence = nosie.basePersistence;
+        float amplitude = nosie.baseAmplitude;
 
         float noiseValue = 0f;
         float heightValue = 0;
 
         //loop through each octave and calculate the noise value
-        for (int i = 0; i < noiseSettings.octaves; i++)
+        for (int i = 0; i < nosie.octaves; i++)
         {
-            float sampleZ = z / noiseSettings.scale * frequency + offsetSeed[i].y;
-            float sampleX = x / noiseSettings.scale * frequency + offsetSeed[i].x;
+            float sampleZ = z / nosie.scale * frequency + offsetSeed[i].y;
+            float sampleX = x / nosie.scale * frequency + offsetSeed[i].x;
 
 
             noiseValue = (Mathf.PerlinNoise(sampleZ, sampleX)) * 2 - 1;
-            heightValue += terrainSettings.heightCurve.Evaluate(noiseValue) * amplitude;
+            heightValue += terrain.heightCurve.Evaluate(noiseValue) * amplitude;
 
             amplitude *= persistence; // Decrease amplitude for next octave
-            frequency *= noiseSettings.lacunarity; // Increase frequency for next octave
+            frequency *= nosie.lacunarity; // Increase frequency for next octave
 
         }
         return heightValue; 
@@ -195,15 +196,15 @@ public class Terrain_Generator : MonoBehaviour
         Vector2[] octaveOffsets = GetOffsetSeed();
 
         
-        vertices = new Vector3[(terrainSettings.terrainX + 1) * (terrainSettings.terrainZ + 1)];
+        vertices = new Vector3[(terrain.sizeX + 1) * (terrain.sizeZ + 1)];
 
-        for (int i = 0, z = 0; z <= terrainSettings.terrainZ; z++)
+        for (int i = 0, z = 0; z <= terrain.sizeZ; z++)
         {
-            for (int x = 0; x <= terrainSettings.terrainX; x++)
+            for (int x = 0; x <= terrain.sizeX; x++)
             {
                 // Assign and set height of each vertices
                 float noiseHeight = GenerateNoiseHeight(z, x, octaveOffsets);
-                if (noiseHeight <= noiseSettings.lowerThreshold)
+                if (noiseHeight <= nosie.lowerThreshold)
                     noiseHeight = 0;           
               
                 SetMinMaxHeights(noiseHeight);
@@ -216,22 +217,22 @@ public class Terrain_Generator : MonoBehaviour
     private void CreateTriangles()
     {
         // Need 6 vertices to create a square (2 triangles)
-        triangles = new int[terrainSettings.terrainX * terrainSettings.terrainZ * 6];
+        triangles = new int[terrain.sizeX * terrain.sizeZ * 6];
         int vert = 0;
         int tris = 0;
 
         // loop through rows
-        for (int z = 0; z < terrainSettings.terrainZ; z++)
+        for (int z = 0; z < terrain.sizeZ; z++)
         {
             // fill all columns in row
-            for (int x = 0; x < terrainSettings.terrainX; x++)
+            for (int x = 0; x < terrain.sizeX; x++)
             {
                 triangles[tris + 0] = vert + 0;
-                triangles[tris + 1] = vert + terrainSettings.terrainX + 1;
+                triangles[tris + 1] = vert + terrain.sizeX + 1;
                 triangles[tris + 2] = vert + 1;
                 triangles[tris + 3] = vert + 1;
-                triangles[tris + 4] = vert + terrainSettings.terrainX + 1;
-                triangles[tris + 5] = vert + terrainSettings.terrainX + 2;
+                triangles[tris + 4] = vert + terrain.sizeX + 1;
+                triangles[tris + 5] = vert + terrain.sizeX + 2;
 
                 vert++;
                 tris += 6;
@@ -248,7 +249,7 @@ public class Terrain_Generator : MonoBehaviour
         for (int i = 0, z = 0; z < vertices.Length; z++)
         {
             float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
-            colours[i] = terrainSettings.gradient.Evaluate(height);
+            colours[i] = terrain.gradient.Evaluate(height);
             i++;
         }
 
@@ -268,17 +269,17 @@ public class Terrain_Generator : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
         gameObject.transform.localScale = new Vector3(
-            terrainSettings.terrainScale, 
-            terrainSettings.terrainScale, 
-            terrainSettings.terrainScale);
+            terrain.scale, 
+            terrain.scale, 
+            terrain.scale);
 
-        GetComponent<MeshRenderer>().material = terrainSettings.material;
+        GetComponent<MeshRenderer>().material = terrain.material;
     }
 
 
     public void RandomiseSeed()
     {
-        noiseSettings.seed = Random.Range(0, 1000);
+        nosie.seed = Random.Range(0, 1000);
     }
     public void ClearMesh()
     {
