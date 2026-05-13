@@ -5,17 +5,19 @@ public class Terrain_Chunk : MonoBehaviour
     private Noise_Settings noise;
     private Terrain_Generation_Settings terrain; 
    
-    private int chunkX;
-    private int chunkZ;
+    private int chunkX, chunkZ;
 
     private Mesh mesh;
     private Vector3[] vertices;
     private int[] triangles;
 
+    private Vector2[] offsetSeed;
+
     private float minTerrainheight;
     private float maxTerrainheight;
 
     private Color[] colours;
+
     private void AssignMesh()
     {
         if (mesh == null)
@@ -58,6 +60,8 @@ public class Terrain_Chunk : MonoBehaviour
         if (noiseHeight < minTerrainheight)
             minTerrainheight = noiseHeight;
     }
+
+    // Create the actual mesh shape by assigning vertices, uses GenerateNoiseHeight and SetMinMaxHeights //
     private void CreateMeshShape(Vector2[] offsetSeed)
     {
         Vector2[] octaveOffsets = offsetSeed;
@@ -70,7 +74,11 @@ public class Terrain_Chunk : MonoBehaviour
             for (int x = 0; x <= terrain.sizeX; x++)
             {
                 // Assign and set height of each vertices
-                float noiseHeight = GenerateNoiseHeight(z, x, octaveOffsets);
+                
+                float worldX = x + chunkX * terrain.sizeX;
+                float worldZ = z + chunkZ * terrain.sizeZ;
+
+                float noiseHeight = GenerateNoiseHeight(worldZ, worldX, octaveOffsets);
                 if (noiseHeight <= noise.lowerThreshold)
                     noiseHeight = 0;
 
@@ -112,7 +120,7 @@ public class Terrain_Chunk : MonoBehaviour
         colours = new Color[vertices.Length];
 
         // Loop over vertices and apply a color from the depending on height (y axis value)
-        for (int i = 0, z = 0; z < vertices.Length; z++)
+        for (int i = 0; i < vertices.Length; i++)
         {
             float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
             colours[i] = terrain.gradient.Evaluate(height);
@@ -146,21 +154,36 @@ public class Terrain_Chunk : MonoBehaviour
         GetComponent<MeshRenderer>().material = terrain.material;
     }
 
-    public void GenerateChunk(
+
+    //  *ENTRY POINT* //
+    public void CreateNewTerrainChunk(
         Noise_Settings noise_settings, 
         Terrain_Generation_Settings terrain_generation_settings, 
-        Vector2[] offsetSeed,
-        int x, int y) //coordinates of the chunk
+        Vector2[] offset_seed,
+        int x, int z) //coordinates of the chunk
     {
+        //Assign variables
         noise = noise_settings;
         terrain = terrain_generation_settings;
+        offsetSeed = offset_seed;
+        chunkX = x;
+        chunkZ = z;
 
+        //Call generate mesh
+        GenerateMesh();
+
+    }
+
+    private void GenerateMesh()
+    {
+        //Generate Mesh
         AssignMesh();
         CreateMeshShape(offsetSeed);
         CreateTriangles();
         ColourTerrain();
         UpdateMesh();
-
     }
+
+    
 
 }
