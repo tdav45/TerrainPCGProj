@@ -32,9 +32,7 @@ public class Terrain_Generator_Editor : Editor
 
 
 //TERRAIN GENERATION//
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
+
 public class Terrain_Generator : MonoBehaviour
 {
 
@@ -87,19 +85,11 @@ public class Terrain_Generator : MonoBehaviour
 
     // [SerializeField] private Gradient gradient;
 
+    [SerializeField] private GameObject terrainChunkPrefab;
+    
     public Terrain_Generation_Settings terrain;
-    public Noise_Settings nosie;
+    public Noise_Settings noise;
 
-    private Color[] colours;
-
-
-    private float minTerrainheight;
-    private float maxTerrainheight;
-
-
-    private Vector3[] vertices;
-    private int[] triangles;
-    private Mesh mesh;
 
 
 
@@ -107,12 +97,12 @@ public class Terrain_Generator : MonoBehaviour
     //Get the offset seed for each octave
     private Vector2[] GetOffsetSeed()
     {
-        Vector2[] offsetSeed = new Vector2[nosie.octaves];
+        Vector2[] offsetSeed = new Vector2[noise.octaves];
 
-        System.Random prng = new System.Random(nosie.seed);
+        System.Random prng = new System.Random(noise.seed);
 
 
-        for (int i = 0; i < nosie.octaves; i++)
+        for (int i = 0; i < noise.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000);
             float offsetY = prng.Next(-100000, 100000);
@@ -125,11 +115,11 @@ public class Terrain_Generator : MonoBehaviour
    
     public void RandomiseSeed()
     {
-        nosie.seed = Random.Range(0, 1000);
+        noise.seed = Random.Range(0, 1000);
     }
 
-    
-   //GENERATE TERRAIN (ENTRY POINT)//
+
+    //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain()
     {
         /*        AssignMesh();
@@ -138,9 +128,18 @@ public class Terrain_Generator : MonoBehaviour
                 ColourTerrain();
                 UpdateMesh();*/
 
-        Instantiate(gameObject.AddComponent<Terrain_Chunk>());
+        var chunk = Instantiate(terrainChunkPrefab);
 
+        int xCor = 1, zCor = 1;
+        
+        if ( chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(noise, terrain,
+            GetOffsetSeed(), xCor, zCor))
+        {
+            Debug.Log("New Chunk generated at: " + xCor + " "+ zCor);
+        }
+    
     }
+
 
 
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class Terrain_Chunk : MonoBehaviour
 {
     private Noise_Settings noise;
@@ -74,11 +75,11 @@ public class Terrain_Chunk : MonoBehaviour
             for (int x = 0; x <= terrain.sizeX; x++)
             {
                 // Assign and set height of each vertices
-                
-                float worldX = x + chunkX * terrain.sizeX;
-                float worldZ = z + chunkZ * terrain.sizeZ;
 
-                float noiseHeight = GenerateNoiseHeight(worldZ, worldX, octaveOffsets);
+                float worldX = (chunkX * terrain.sizeX) + x;
+                float worldZ = (chunkZ * terrain.sizeZ) + z;
+
+                float noiseHeight = GenerateNoiseHeight(worldX, worldZ, octaveOffsets);
                 if (noiseHeight <= noise.lowerThreshold)
                     noiseHeight = 0;
 
@@ -124,7 +125,6 @@ public class Terrain_Chunk : MonoBehaviour
         {
             float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
             colours[i] = terrain.gradient.Evaluate(height);
-            i++;
         }
 
     }
@@ -156,7 +156,7 @@ public class Terrain_Chunk : MonoBehaviour
 
 
     //  *ENTRY POINT* //
-    public void CreateNewTerrainChunk(
+    public bool CreateNewTerrainChunk(
         Noise_Settings noise_settings, 
         Terrain_Generation_Settings terrain_generation_settings, 
         Vector2[] offset_seed,
@@ -172,6 +172,8 @@ public class Terrain_Chunk : MonoBehaviour
         //Call generate mesh
         GenerateMesh();
 
+        return true;
+
     }
 
     private void GenerateMesh()
@@ -184,6 +186,7 @@ public class Terrain_Chunk : MonoBehaviour
         UpdateMesh();
     }
 
-    
+
+
 
 }
