@@ -24,27 +24,9 @@ public class Terrain_Generator_Editor : Editor
     }
 }
 
-public struct Terrain_Generation_Settings
-{
-    public Material material;
-    public AnimationCurve heightCurve;
-    public int sizeX, sizeZ; //Size of terrain along each axis
-    public int scale; //Scale multiplier
-    public Gradient gradient; //Colour gradient that applies to the material
-}
 
-public struct Noise_Settings
-{
-    public int octaves; //How many octaves of noise
-    public int seed; //Seed for random number generation
-    public int scale; //Scale of the noise
-    public float baseAmplitude; //Amplitude that scales height of the terrian
-    public float baseFrequency; //Base frequency for the noise
-    public float basePersistence; //Base persistence for the noise
-    public float lacunarity; //Lacunarity for the nosie
-    public float lowerThreshold; //Height threshold, any height lower will be set to 0 
 
-}
+
 
 
 
