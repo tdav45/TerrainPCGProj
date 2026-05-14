@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "new_terrain_settings", menuName = "New Terrain Settings", order = 1)]
+[CreateAssetMenu(fileName = "new_global_terrain_settings", menuName = "New Globabl Terrain Settings", order = 1)]
 public class Global_Terrain_Settings : ScriptableObject
 {
     public int sizeX, sizeZ; //Size of terrain along each axis

@@ -87,7 +87,6 @@ public class Terrain_Generator : MonoBehaviour
     // [SerializeField] private Gradient gradient;
 
 
-
     [SerializeField] 
     private GameObject terrainChunkPrefab;
 
@@ -97,28 +96,23 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField]
     private GameObject terrainHolder;
     [SerializeField]
-    private Biome_Settings[] biomes;
-
-
-    public Terrain_Generation_Settings terrain;
-    public Noise_Settings noise;
+    private Global_Terrain_Settings globalTerrainSettings; //Global settings that apply to all chunks/biomes
+    [SerializeField]
+    private Biome_Settings[] biomes; // Array of biome settings to randomly select from when generating terrain
 
     private bool isGenerating = false;
     private List<GameObject> generatedTerrainChunks;
-
-    private Noise_Settings localNoiseSettings;
-    private Terrain_Generation_Settings localTerrainSettings;
 
 
     //Get the offset seed for each octave
     private Vector2[] GetOffsetSeed()
     {
-        Vector2[] offsetSeed = new Vector2[noise.octaves];
+        Vector2[] offsetSeed = new Vector2[globalTerrainSettings.octaves];
 
-        System.Random prng = new System.Random(noise.seed);
+        System.Random prng = new System.Random(globalTerrainSettings.seed);
 
 
-        for (int i = 0; i < noise.octaves; i++)
+        for (int i = 0; i < globalTerrainSettings.octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000);
             float offsetY = prng.Next(-100000, 100000);
@@ -131,7 +125,7 @@ public class Terrain_Generator : MonoBehaviour
    
     public void RandomiseSeed()
     {
-        noise.seed = Random.Range(0, 1000);
+        globalTerrainSettings.seed = Random.Range(0, 1000);
     }
 
     public void ResetIsGenerating()
@@ -162,7 +156,7 @@ public class Terrain_Generator : MonoBehaviour
         return biomes[r];
     }
 
-    private void AdjustSettingsByBiome()
+/*    private void AdjustSettingsByBiome()
     {
        //Temporary manual override
         Biome_Settings biomeSettings = GetBiome();
@@ -177,7 +171,7 @@ public class Terrain_Generator : MonoBehaviour
         localNoiseSettings = Instantiate(noise);
         localNoiseSettings.baseAmplitude = biomeSettings.baseAmplitude;
 
-    }
+    }*/
 
 
     //GENERATE TERRAIN (ENTRY POINT)//
@@ -196,7 +190,7 @@ public class Terrain_Generator : MonoBehaviour
             }
 
             //Override settings by biome
-            AdjustSettingsByBiome();
+            //AdjustSettingsByBiome();
 
             //Generate grid
             for (int i = 0; i < gridSize; i++)
@@ -222,7 +216,7 @@ public class Terrain_Generator : MonoBehaviour
         var chunk = Instantiate(terrainChunkPrefab);
         chunk.transform.parent = parent.transform;
 
-        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(localNoiseSettings, localTerrainSettings,
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, biome,
             GetOffsetSeed(), x, z))
         {
             Debug.Log("New Chunk generated at: " + x + " " + z);
