@@ -169,7 +169,7 @@ MonoBehaviour:
   globalTerrainSettings: {fileID: 11400000, guid: 2f996631e1d64ff45984162b3bb8948d, type: 2}
   biomePool:
   - {fileID: 11400000, guid: c46435744a3c6094aa6de991eec4f433, type: 2}
-  useAllBiomes: 0
+  useAllBiomes: 1
   isRandomSeed: 0
 --- !u!43 &87862328
 Mesh:

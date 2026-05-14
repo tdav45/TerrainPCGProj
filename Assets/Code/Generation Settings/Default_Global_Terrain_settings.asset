@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a70c9508a3911249b7cb64903d05b3f, type: 3}
-  m_Name: new_global_terrain_settings
+  m_Name: Default_Global_Terrain_settings
   m_EditorClassIdentifier: Assembly-CSharp::Global_Terrain_Settings
   sizeX: 64
   sizeZ: 64

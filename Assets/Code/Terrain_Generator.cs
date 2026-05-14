@@ -134,7 +134,7 @@ public class Terrain_Generator : MonoBehaviour
 
     public void ResetIsGenerating()
     {
-               isGenerating = false;
+        isGenerating = false;
     }
 
     public void RemovePreviousGeneration()
@@ -163,6 +163,12 @@ public class Terrain_Generator : MonoBehaviour
             allBiomes.Add(biomeSettings);
 
         }
+    }
+
+    private void BiomeNoise()
+    {
+        
+
     }
 
     private Biome_Settings GetBiome()
