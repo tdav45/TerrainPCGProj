@@ -11,6 +11,7 @@ public class Global_Terrain_Settings : ScriptableObject
     public float baseFrequency; //Base frequency for the noise
     public float basePersistence; //Base persistence for the noise
     public float lacunarity; //Lacunarity for the nosie
+    public Material material;
 
 
 }

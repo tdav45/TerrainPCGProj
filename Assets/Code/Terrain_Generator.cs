@@ -37,55 +37,6 @@ public class Terrain_Generator_Editor : Editor
 //TERRAIN GENERATION//
 public class Terrain_Generator : MonoBehaviour
 {
-
-    /*Old variables
-     * [SerializeField]
-    private Material grassMaterial;
-    
-    //Terrian mesh settings
-    [Tooltip("Curve controls the range of height of the terrain")]
-    [SerializeField]
-    private AnimationCurve heightCurve;
-    [Tooltip("Size of the terrain in the X axis")]
-    [SerializeField]
-    private int terrainX = 100;
-    [Tooltip("Size of the terrain in the Z axis")]
-    [SerializeField]
-    private int terrainZ = 100;
-    
-    //NOISE SETTINGS//
-
-    [SerializeField]
-    private int terrainScale = 100;
-    [Tooltip("Number of layers of noise to add detail to the terrain")]
-    [SerializeField]
-    private int octaves = 4;
-    [Tooltip("Controls the frequency of the noise, higher values will create more detailed terrain")]
-    [SerializeField]
-    private float scale = 20f;
-    [Tooltip("Seed for random number generator, changing this will create a different terrain")]
-    [SerializeField]
-    private int seed = 0;
-
-    [Tooltip("Base amplitude, scales the height of the terrain, higher values will create taller terrain")]
-    [SerializeField]
-    private float baseAmplitude;
-
-    [Tooltip("Base frequency for the noise, higher values will create more detailed terrain")]
-    [SerializeField]
-    private float baseFrequency = 1f;
-    [Tooltip("Base persistence for the noise, higher values will create more rugged terrain")]
-    [SerializeField]
-    private float basePersistence = 0.5f;
-    [Tooltip("Lacunarity for the noise, higher values will create more detailed terrain")]
-    [SerializeField]
-    private float lacunarity = 2f;
-    [Tooltip("Height threshold for the terrain, any height below this value will be set to 0")]
-    [SerializeField]
-    private float lowerThreshold = 0.04f;*/
-    // [SerializeField] private Gradient gradient;
-
-
     [SerializeField] 
     private GameObject terrainChunkPrefab;
 
@@ -103,9 +54,10 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField]
     private bool isRandomSeed;
 
-    private List<Biome_Settings> allBiomes;
+    private List<Biome_Settings> allBiomes; //All biome assets
     private bool isGenerating = false;
     private List<GameObject> generatedTerrainChunks;
+
 
 
     //Get the offset seed for each octave
@@ -126,7 +78,22 @@ public class Terrain_Generator : MonoBehaviour
 
         return offsetSeed;
     }
-   
+
+    private Vector2 BiomeOffsetSeed()
+    {
+        System.Random prng = new System.Random(globalTerrainSettings.seed);
+        Vector2 biomeOffset;
+
+
+        float offsetX = prng.Next(-100000, 100000);
+        float offsetY = prng.Next(-100000, 100000);
+
+        biomeOffset = new Vector2(offsetX, offsetY);
+
+
+        return biomeOffset;
+    }
+
     public void RandomiseSeed()
     {
         globalTerrainSettings.seed = Random.Range(0, 1000);
@@ -180,56 +147,6 @@ public class Terrain_Generator : MonoBehaviour
         }
     }
 
-    private Biome_Settings BiomeNoise(int chunkX, int chunkZ)
-    {
-        // Generate noise map for biomes
-        //Intergrate GetBiome()
-
-        float worldX = chunkX * globalTerrainSettings.sizeX;
-        float worldZ = chunkZ * globalTerrainSettings.sizeZ;
-
-        float biomeValue = Mathf.PerlinNoise(
-            worldX / 300,
-            worldZ / 300
-        );
-
-        allBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold)); //Sort all biomes by their noise threshold
-
-        foreach (Biome_Settings biome in allBiomes)
-        {
-            if (biomeValue <= biome.noiseThreshold)
-            {
-                return biome;
-            }
-        }
-        
-
-        return allBiomes[0];
-    }
-
-    //Random biome
-   /* private Biome_Settings GetBiome()
-    {
-        if (useAllBiomes)
-        {
-            MakeBiomePool();
-        }
-
-        else
-        {
-            allBiomes = new List<Biome_Settings>(biomePool);
-        }
-
-        if (allBiomes.Count == 0)
-        {
-            Debug.LogError("No biomes assigned to the terrain generator");
-            return null;
-        }
-        int r = Random.Range(0, allBiomes.Count);
-        Debug.Log("Selected biome: " + allBiomes[r].name);
-        return allBiomes[r];
-    }*/
-
     //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain()
     {
@@ -249,6 +166,7 @@ public class Terrain_Generator : MonoBehaviour
             //AdjustSettingsByBiome();
 
             Vector2[] offsetSeed = GetOffsetSeed();
+            Vector2 biomeOffsetSeed = BiomeOffsetSeed();
 
             SetupBiomes();
 
@@ -257,7 +175,7 @@ public class Terrain_Generator : MonoBehaviour
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    NewChunk(i, j, terrainHolder, BiomeNoise(i, j), offsetSeed);
+                    NewChunk(i, j, terrainHolder, offsetSeed, biomeOffsetSeed);
                 }
             }
 
@@ -271,15 +189,15 @@ public class Terrain_Generator : MonoBehaviour
 
     }
 
-    private void NewChunk(int x, int z, GameObject parent, Biome_Settings biome, Vector2[] offsetSeed)
+    private void NewChunk(int x, int z, GameObject parent, Vector2[] offsetSeed, Vector2 biomeOffsetSeed)
     {
         var chunk = Instantiate(terrainChunkPrefab);
         chunk.transform.parent = parent.transform;
 
-        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, biome,
-            offsetSeed, x, z))
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, allBiomes,
+            offsetSeed, biomeOffsetSeed, x, z))
         {
-            Debug.Log("New Chunk generated at: " + x + " " + z);
+           // Debug.Log("New Chunk generated at: " + x + " " + z);
         }
 
         generatedTerrainChunks.Add(chunk);

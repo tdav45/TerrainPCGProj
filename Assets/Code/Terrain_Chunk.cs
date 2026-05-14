@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -5,7 +6,7 @@ public class Terrain_Chunk : MonoBehaviour
 {
 
     private Global_Terrain_Settings terrainSettings;
-    private Biome_Settings biomeSettings;
+    private List<Biome_Settings> currentBiomes; //biomes being used
 
     private int chunkX, chunkZ;
 
@@ -14,11 +15,14 @@ public class Terrain_Chunk : MonoBehaviour
     private int[] triangles;
 
     private Vector2[] offsetSeed;
+    private Vector2 biomeOffsetSeed;
 
     private float minTerrainheight;
     private float maxTerrainheight;
 
     private Color[] colours;
+
+
 
     private void AssignMesh()
     {
@@ -29,11 +33,11 @@ public class Terrain_Chunk : MonoBehaviour
             GetComponent<MeshFilter>().mesh = mesh;
         }
     }
-    private float GenerateNoiseHeight(float x, float z, Vector2[] offsetSeed)
+    private float GenerateNoiseHeight(float x, float z, Vector2[] offsetSeed, Biome_Settings biome)
     {
         float frequency = terrainSettings.baseFrequency;
         float persistence = terrainSettings.basePersistence;
-        float amplitude = biomeSettings.baseAmplitude;
+        float amplitude = biome.baseAmplitude;
 
         float noiseValue = 0f;
         float heightValue = 0;
@@ -41,12 +45,12 @@ public class Terrain_Chunk : MonoBehaviour
         //loop through each octave and calculate the noise value
         for (int i = 0; i < terrainSettings.octaves; i++)
         {
-            float sampleZ = z / biomeSettings.noiseScale * frequency + offsetSeed[i].y;
-            float sampleX = x / biomeSettings.noiseScale * frequency + offsetSeed[i].x;
+            float sampleZ = z / biome.noiseScale * frequency + offsetSeed[i].y;
+            float sampleX = x / biome.noiseScale * frequency + offsetSeed[i].x;
 
 
             noiseValue = (Mathf.PerlinNoise(sampleZ, sampleX)) * 2 - 1;
-            heightValue += biomeSettings.heightCurve.Evaluate(noiseValue) * amplitude;
+            heightValue += biome.heightCurve.Evaluate(noiseValue) * amplitude;
 
             amplitude *= persistence; // Decrease amplitude for next octave
             frequency *= terrainSettings.lacunarity; // Increase frequency for next octave
@@ -62,6 +66,26 @@ public class Terrain_Chunk : MonoBehaviour
         if (noiseHeight < minTerrainheight)
             minTerrainheight = noiseHeight;
     }
+
+    private Biome_Settings GetBiomeAtPoint(float worldX, float worldZ)
+    {
+        float biomeNoise = Mathf.PerlinNoise( worldX / 300 + biomeOffsetSeed.x, 
+            worldZ / 300 + biomeOffsetSeed.y);
+
+        currentBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
+
+        foreach (Biome_Settings biome in currentBiomes)
+        {
+            if (biomeNoise <= biome.noiseThreshold)
+            {
+                return biome;
+            }
+        }
+
+        return currentBiomes[0];
+    }
+
+
 
     // Create the actual mesh shape by assigning vertices, uses GenerateNoiseHeight and SetMinMaxHeights //
     private void CreateMeshShape(Vector2[] offsetSeed)
@@ -80,8 +104,10 @@ public class Terrain_Chunk : MonoBehaviour
                 float worldX = (chunkX * terrainSettings.sizeX) + x;
                 float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
-                float noiseHeight = GenerateNoiseHeight(worldX, worldZ, octaveOffsets);
-                if (noiseHeight <= biomeSettings.lowerThreshold)
+                Biome_Settings biome = GetBiomeAtPoint(worldX, worldZ);
+
+                float noiseHeight = GenerateNoiseHeight(worldX, worldZ, octaveOffsets, biome);
+                if (noiseHeight <= biome.lowerThreshold)
                     noiseHeight = 0;
 
                 SetMinMaxHeights(noiseHeight);
@@ -117,17 +143,35 @@ public class Terrain_Chunk : MonoBehaviour
         }
     }
 
+
     private void ColourTerrain()
     {
         colours = new Color[vertices.Length];
 
-        // Loop over vertices and apply a color from the depending on height (y axis value)
-        for (int i = 0; i < vertices.Length; i++)
+        for (int i = 0, z = 0; z <= terrainSettings.sizeZ; z++)
         {
-            float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
-            colours[i] = biomeSettings.gradient.Evaluate(height);
-        }
+            for (int x = 0; x <= terrainSettings.sizeX; x++)
+            {
+                // Convert local vertex to world position
+                float worldX =
+                    (chunkX * terrainSettings.sizeX) + x;
 
+                float worldZ =
+                    (chunkZ * terrainSettings.sizeZ) + z;
+
+                // Get biome at this vertex
+                Biome_Settings biome =
+                    GetBiomeAtPoint(worldX, worldZ);
+
+                // Normalize height
+                float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
+
+                // Use biome gradient
+                colours[i] = biome.gradient.Evaluate(height);
+
+                i++;
+            }
+        }
     }
 
     public void ClearMesh()
@@ -155,9 +199,10 @@ public class Terrain_Chunk : MonoBehaviour
 
         //Offset chunk position
         transform.position = new Vector3(chunkX * terrainSettings.sizeX * terrainSettings.meshScale, 0,
-            chunkZ * terrainSettings.sizeZ * terrainSettings.meshScale);  
+            chunkZ * terrainSettings.sizeZ * terrainSettings.meshScale);
 
-        GetComponent<MeshRenderer>().material = biomeSettings.material;
+        GetComponent<MeshRenderer>().material = terrainSettings.material;
+
     }
 
 
@@ -166,14 +211,16 @@ public class Terrain_Chunk : MonoBehaviour
         //Noise_Settings noise_settings, 
         //Terrain_Generation_Settings terrain_generation_settings, 
         Global_Terrain_Settings global_terrain_settings,
-        Biome_Settings biome_settings,
+        List<Biome_Settings> biomesInUse,
         Vector2[] offset_seed,
+        Vector2 biome_offset_seed,
         int x, int z) //coordinates of the chunk
     {
         //Assign variables
         terrainSettings = global_terrain_settings;
-        biomeSettings = biome_settings;
+        currentBiomes = biomesInUse;
         offsetSeed = offset_seed;
+        biomeOffsetSeed = biome_offset_seed;
         chunkX = x;
         chunkZ = z;
 
