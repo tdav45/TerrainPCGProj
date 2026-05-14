@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using NUnit.Framework;
 using System.Collections.Generic;
 
 //GUI//
@@ -91,7 +90,9 @@ public class Terrain_Generator : MonoBehaviour
 
     [SerializeField] 
     private GameObject terrainChunkPrefab;
+
     [SerializeField]
+    [Range(1, 16)]
     private int gridSize = 10;
     [SerializeField]
     private GameObject terrainHolder;
