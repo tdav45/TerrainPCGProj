@@ -1,6 +1,9 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.IO;
+using Unity.VisualScripting;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
 
 //GUI//
 [CustomEditor(typeof(Terrain_Generator))]
@@ -12,14 +15,9 @@ public class Terrain_Generator_Editor : Editor
 
         Terrain_Generator terrainGenerator = (Terrain_Generator)target;
         
-        if (GUILayout.Button("Generate Terrain (static seed)"))
+        if (GUILayout.Button("Generate Terrain"))
         {
-            terrainGenerator.CreateNewTerrain(false);
-        }
-
-        if (GUILayout.Button("Generate Terrain (random seed)"))
-        {
-            terrainGenerator.CreateNewTerrain(true);
+            terrainGenerator.CreateNewTerrain();
         }
 
         if(GUILayout.Button("Clear Terrain"))
@@ -27,7 +25,8 @@ public class Terrain_Generator_Editor : Editor
             terrainGenerator.RemovePreviousGeneration();
         }
 
-       if (GUILayout.Button("Reset Is Generating"))
+       
+        if (GUILayout.Button("Reset Is Generating"))
         {
             terrainGenerator.ResetIsGenerating();
         }
@@ -98,8 +97,13 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField]
     private Global_Terrain_Settings globalTerrainSettings; //Global settings that apply to all chunks/biomes
     [SerializeField]
-    private Biome_Settings[] biomes; // Array of biome settings to randomly select from when generating terrain
+    private Biome_Settings[] biomePool; // Array of biome settings to randomly select from when generating terrain
+    [SerializeField]
+    private bool useAllBiomes;
+    [SerializeField]
+    private bool isRandomSeed;
 
+    private List<Biome_Settings> allBiomes;
     private bool isGenerating = false;
     private List<GameObject> generatedTerrainChunks;
 
@@ -144,38 +148,47 @@ public class Terrain_Generator : MonoBehaviour
         }
     }
 
+    private void MakeBiomePool()
+    {
+        foreach (var biome in AssetDatabase.FindAssets("t:Biome_Settings", new[] { "Assets/Code/Generation Settings/Biomes" }))
+        {
+            var path = AssetDatabase.GUIDToAssetPath(biome);
+            Biome_Settings biomeSettings = AssetDatabase.LoadAssetAtPath(path, typeof(Biome_Settings)) as Biome_Settings;
+            if (biomeSettings != null)
+            {
+                Debug.Log("Loaded biome: " + biomeSettings.name);
+            }
+
+
+            allBiomes.Add(biomeSettings);
+
+        }
+    }
+
     private Biome_Settings GetBiome()
     {
-        if(biomes.Length == 0)
+        if (useAllBiomes)
+        {
+            MakeBiomePool();
+        }
+
+        else
+        {
+            allBiomes = new List<Biome_Settings>(biomePool);
+        }
+
+        if (allBiomes.Count == 0)
         {
             Debug.LogError("No biomes assigned to the terrain generator");
             return null;
         }
-        int r = Random.Range(0, biomes.Length);
-        Debug.Log("Selected biome: " + biomes[r].name);
-        return biomes[r];
+        int r = Random.Range(0, allBiomes.Count);
+        Debug.Log("Selected biome: " + allBiomes[r].name);
+        return allBiomes[r];
     }
 
-/*    private void AdjustSettingsByBiome()
-    {
-       //Temporary manual override
-        Biome_Settings biomeSettings = GetBiome();
-
-        //Create instance
-        // localTerrainSettings = ScriptableObject.CreateInstance<Terrain_Generation_Settings>();
-        localTerrainSettings = Instantiate(terrain);
-        localTerrainSettings.material = biomeSettings.material;
-        localTerrainSettings.heightCurve = biomeSettings.heightCurve;
-        localTerrainSettings.gradient = biomeSettings.gradient;
-
-        localNoiseSettings = Instantiate(noise);
-        localNoiseSettings.baseAmplitude = biomeSettings.baseAmplitude;
-
-    }*/
-
-
     //GENERATE TERRAIN (ENTRY POINT)//
-    public void CreateNewTerrain(bool isRandomSeed)
+    public void CreateNewTerrain()
     {
         if (isGenerating == false)
         {
