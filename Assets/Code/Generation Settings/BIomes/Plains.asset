@@ -26,8 +26,17 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
+      time: 0.9170046
+      value: 0.40020084
+      inSlope: 1.5340095
+      outSlope: 1.5340095
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.0916748
+      value: 0.70000076
       inSlope: 2
       outSlope: 2
       tangentMode: 0
@@ -37,11 +46,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 5
+  baseAmplitude: 6
   gradient:
     serializedVersion: 2
     key0: {r: 0.04883463, g: 0.31132078, b: 0, a: 1}
-    key1: {r: 0, g: 0.6415094, b: 0.0022936047, a: 1}
+    key1: {r: 0.05882353, g: 0.31132078, b: 0, a: 1}
     key2: {r: 0, g: 0, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -68,3 +77,6 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
+  noiseScale: 80
+  lowerThreshold: 0
+  noiseTarget: 0

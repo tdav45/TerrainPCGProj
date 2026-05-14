@@ -41,8 +41,8 @@ public class Terrain_Chunk : MonoBehaviour
         //loop through each octave and calculate the noise value
         for (int i = 0; i < terrainSettings.octaves; i++)
         {
-            float sampleZ = z / terrainSettings.noiseScale * frequency + offsetSeed[i].y;
-            float sampleX = x / terrainSettings.noiseScale * frequency + offsetSeed[i].x;
+            float sampleZ = z / biomeSettings.noiseScale * frequency + offsetSeed[i].y;
+            float sampleX = x / biomeSettings.noiseScale * frequency + offsetSeed[i].x;
 
 
             noiseValue = (Mathf.PerlinNoise(sampleZ, sampleX)) * 2 - 1;
@@ -81,7 +81,7 @@ public class Terrain_Chunk : MonoBehaviour
                 float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
                 float noiseHeight = GenerateNoiseHeight(worldX, worldZ, octaveOffsets);
-                if (noiseHeight <= terrainSettings.lowerThreshold)
+                if (noiseHeight <= biomeSettings.lowerThreshold)
                     noiseHeight = 0;
 
                 SetMinMaxHeights(noiseHeight);
@@ -143,6 +143,7 @@ public class Terrain_Chunk : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
+        mesh.RecalculateUVDistributionMetrics();
         mesh.name = "terrain_mesh";
 
         GetComponent<MeshCollider>().sharedMesh = mesh;

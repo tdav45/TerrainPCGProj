@@ -157,10 +157,12 @@ public class Terrain_Generator : MonoBehaviour
             if (biomeSettings != null)
             {
                 Debug.Log("Loaded biome: " + biomeSettings.name);
+
+                allBiomes.Add(biomeSettings);
             }
 
 
-            allBiomes.Add(biomeSettings);
+
 
         }
     }
