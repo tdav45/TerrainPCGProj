@@ -70,4 +70,4 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   noiseScale: 35
   lowerThreshold: 1
-  noiseTarget: 0
+  noiseThreshold: 1

@@ -146,6 +146,9 @@ public class Terrain_Generator : MonoBehaviour
                 DestroyImmediate(terrain);
             }
         }
+
+        generatedTerrainChunks = new List<GameObject>();
+
     }
 
     private void MakeBiomePool()
@@ -160,21 +163,52 @@ public class Terrain_Generator : MonoBehaviour
 
                 allBiomes.Add(biomeSettings);
             }
-
-
-
-
         }
     }
 
-    private void BiomeNoise()
+    private void SetupBiomes()
     {
-       // Generate noise map for biomes
-       //Intergrate GetBiome()
+        allBiomes = new List<Biome_Settings>();
 
+        if (useAllBiomes)
+        {
+            MakeBiomePool();
+        }
+        else
+        {
+            allBiomes.AddRange(biomePool);
+        }
     }
 
-    private Biome_Settings GetBiome()
+    private Biome_Settings BiomeNoise(int chunkX, int chunkZ)
+    {
+        // Generate noise map for biomes
+        //Intergrate GetBiome()
+
+        float worldX = chunkX * globalTerrainSettings.sizeX;
+        float worldZ = chunkZ * globalTerrainSettings.sizeZ;
+
+        float biomeValue = Mathf.PerlinNoise(
+            worldX / 300,
+            worldZ / 300
+        );
+
+        allBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold)); //Sort all biomes by their noise threshold
+
+        foreach (Biome_Settings biome in allBiomes)
+        {
+            if (biomeValue <= biome.noiseThreshold)
+            {
+                return biome;
+            }
+        }
+        
+
+        return allBiomes[0];
+    }
+
+    //Random biome
+   /* private Biome_Settings GetBiome()
     {
         if (useAllBiomes)
         {
@@ -194,7 +228,7 @@ public class Terrain_Generator : MonoBehaviour
         int r = Random.Range(0, allBiomes.Count);
         Debug.Log("Selected biome: " + allBiomes[r].name);
         return allBiomes[r];
-    }
+    }*/
 
     //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain()
@@ -214,12 +248,16 @@ public class Terrain_Generator : MonoBehaviour
             //Override settings by biome
             //AdjustSettingsByBiome();
 
+            Vector2[] offsetSeed = GetOffsetSeed();
+
+            SetupBiomes();
+
             //Generate grid
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    NewChunk(i, j, terrainHolder, GetBiome());
+                    NewChunk(i, j, terrainHolder, BiomeNoise(i, j), offsetSeed);
                 }
             }
 
@@ -233,13 +271,13 @@ public class Terrain_Generator : MonoBehaviour
 
     }
 
-    private void NewChunk(int x, int z, GameObject parent, Biome_Settings biome)
+    private void NewChunk(int x, int z, GameObject parent, Biome_Settings biome, Vector2[] offsetSeed)
     {
         var chunk = Instantiate(terrainChunkPrefab);
         chunk.transform.parent = parent.transform;
 
         if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, biome,
-            GetOffsetSeed(), x, z))
+            offsetSeed, x, z))
         {
             Debug.Log("New Chunk generated at: " + x + " " + z);
         }
