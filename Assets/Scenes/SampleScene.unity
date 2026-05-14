@@ -145,7 +145,7 @@ Transform:
   m_GameObject: {fileID: 24418423}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -37, y: 0, z: 0}
   m_LocalScale: {x: 30, y: 30, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -164,7 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Terrain_Generator
   terrainChunkPrefab: {fileID: 8521705488632762623, guid: a3a58fa078d4ca146b967595f8f20b5a, type: 3}
-  gridSize: 1
+  gridSize: 4
+  terrainHolder: {fileID: 1131858493}
   terrain: {fileID: 11400000, guid: fc2e9ef01414bea4d9da8e9ff565bb4c, type: 2}
   noise: {fileID: 11400000, guid: b6ae62d4709d65b4d9388e6f437c9a86, type: 2}
 --- !u!1 &330585543
@@ -593,6 +594,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1131858493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1131858494}
+  m_Layer: 0
+  m_Name: Terrain Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1131858494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131858493}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 168.71176, y: -5.10001, z: 126.33377}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -602,3 +634,4 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 24418425}
   - {fileID: 367619292}
+  - {fileID: 1131858494}

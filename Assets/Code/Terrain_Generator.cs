@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEditor;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 //GUI//
 [CustomEditor(typeof(Terrain_Generator))]
@@ -11,15 +13,25 @@ public class Terrain_Generator_Editor : Editor
 
         Terrain_Generator terrainGenerator = (Terrain_Generator)target;
         
-        if (GUILayout.Button("Generate Terrain"))
+        if (GUILayout.Button("Generate Terrain (static seed)"))
         {
-            terrainGenerator.CreateNewTerrain();
+            terrainGenerator.CreateNewTerrain(false);
         }
 
-        if (GUILayout.Button("Radomise Seed"))
+        if (GUILayout.Button("Generate Terrain (random seed)"))
         {
-            terrainGenerator.RandomiseSeed();
+            terrainGenerator.CreateNewTerrain(true);
         }
+
+        if(GUILayout.Button("Clear Terrain"))
+        {
+            terrainGenerator.RemovePreviousGeneration();
+        }
+
+/*        if (GUILayout.Button("Reset Is Generating"))
+        {
+            terrainGenerator.ResetIsGenerating();
+        }*/
 
     }
 }
@@ -80,13 +92,18 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField] 
     private GameObject terrainChunkPrefab;
     [SerializeField]
-    int gridSize = 10;
-
+    private int gridSize = 10;
+    [SerializeField]
+    private GameObject terrainHolder;
 
     public Terrain_Generation_Settings terrain;
     public Noise_Settings noise;
 
     private bool isGenerating = false;
+
+
+
+    private List<GameObject> generatedTerrainChunks;
 
 
     //Get the offset seed for each octave
@@ -113,15 +130,37 @@ public class Terrain_Generator : MonoBehaviour
         noise.seed = Random.Range(0, 1000);
     }
 
+    public void ResetIsGenerating()
+    {
+               isGenerating = false;
+    }
+
+    public void RemovePreviousGeneration()
+    {
+        if (generatedTerrainChunks != null)
+        {
+            foreach (GameObject terrain in generatedTerrainChunks)
+            {
+                DestroyImmediate(terrain);
+            }
+        }
+    }
+
 
     //GENERATE TERRAIN (ENTRY POINT)//
-    public void CreateNewTerrain()
+    public void CreateNewTerrain(bool isRandomSeed)
     {
         if (isGenerating == false)
         {
             isGenerating = true;
 
-            GameObject terrainHolder = Instantiate(new GameObject("Terrain_Holder"));
+            RemovePreviousGeneration();
+
+
+            if (isRandomSeed)
+            {
+                RandomiseSeed();
+            }
 
             //Generate grid
             for (int i = 0; i < gridSize; i++)
@@ -133,6 +172,8 @@ public class Terrain_Generator : MonoBehaviour
 
 
             }
+
+
 
             isGenerating = false;
         }
@@ -154,6 +195,8 @@ public class Terrain_Generator : MonoBehaviour
         {
             Debug.Log("New Chunk generated at: " + x + " " + z);
         }
+
+        generatedTerrainChunks.Add(chunk);
     }
 
 
