@@ -165,10 +165,14 @@ public class Terrain_Generator : MonoBehaviour
             //Override settings by biome
             //AdjustSettingsByBiome();
 
+            SetupBiomes();
+
             Vector2[] offsetSeed = GetOffsetSeed();
             Vector2 biomeOffsetSeed = BiomeOffsetSeed();
 
-            SetupBiomes();
+            
+
+            allBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
 
             //Generate grid
             for (int i = 0; i < gridSize; i++)

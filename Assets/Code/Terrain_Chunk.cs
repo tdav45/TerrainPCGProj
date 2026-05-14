@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.LightTransport;
 
 
 public class Terrain_Chunk : MonoBehaviour
@@ -21,7 +22,6 @@ public class Terrain_Chunk : MonoBehaviour
     private float maxTerrainheight;
 
     private Color[] colours;
-
 
 
     private void AssignMesh()
@@ -67,22 +67,56 @@ public class Terrain_Chunk : MonoBehaviour
             minTerrainheight = noiseHeight;
     }
 
-    private Biome_Settings GetBiomeAtPoint(float worldX, float worldZ)
+    private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     {
-        float biomeNoise = Mathf.PerlinNoise( worldX / terrainSettings.biomeNoiseScale + biomeOffsetSeed.x, 
-            worldZ / terrainSettings.biomeNoiseScale + biomeOffsetSeed.y);
+        float frequency = terrainSettings.biomeFrequency;
+        float amplitude = 1f;
 
-        currentBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
+        float biomeNoise = 0f;
+        float maxPossibleHeight = 0f;
 
-        foreach (Biome_Settings biome in currentBiomes)
+        for (int i = 0; i < terrainSettings.biomeOctaves; i++)
         {
-            if (biomeNoise <= biome.noiseThreshold)
+            float sampleX = worldX / terrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.x;
+
+            float sampleZ = worldZ / terrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.y;
+
+            float perlin = Mathf.PerlinNoise(sampleX, sampleZ);
+
+            biomeNoise += perlin * amplitude;
+
+            maxPossibleHeight += amplitude;
+
+            amplitude *= terrainSettings.biomePersistence;
+            frequency *= terrainSettings.biomeLacunarity;
+        }
+
+        biomeNoise /= maxPossibleHeight;
+
+        for (int i = 0; i < currentBiomes.Count - 1; i++)
+        {
+            Biome_Settings a = currentBiomes[i];
+            Biome_Settings b = currentBiomes[i + 1];
+
+            if (biomeNoise >= a.noiseThreshold && biomeNoise <= b.noiseThreshold)
             {
-                return biome;
+                float blend = Mathf.InverseLerp( a.noiseThreshold, b.noiseThreshold, biomeNoise);
+
+                return new BiomeBlend
+                {
+                    biomeA = a,
+                    biomeB = b,
+                    blendValue = blend
+                };
             }
         }
 
-        return currentBiomes[0];
+        return new BiomeBlend
+        {
+            biomeA = currentBiomes[0],
+            biomeB = currentBiomes[0],
+            blendValue = 0
+        };
     }
 
 
@@ -90,10 +124,12 @@ public class Terrain_Chunk : MonoBehaviour
     // Create the actual mesh shape by assigning vertices, uses GenerateNoiseHeight and SetMinMaxHeights //
     private void CreateMeshShape(Vector2[] offsetSeed)
     {
-        Vector2[] octaveOffsets = offsetSeed;
-
 
         vertices = new Vector3[(terrainSettings.sizeX + 1) * (terrainSettings.sizeZ + 1)];
+
+        minTerrainheight = float.MaxValue;
+        maxTerrainheight = float.MinValue;
+
 
         for (int i = 0, z = 0; z <= terrainSettings.sizeZ; z++)
         {
@@ -104,14 +140,27 @@ public class Terrain_Chunk : MonoBehaviour
                 float worldX = (chunkX * terrainSettings.sizeX) + x;
                 float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
-                Biome_Settings biome = GetBiomeAtPoint(worldX, worldZ);
+                //Biome_Settings biome = GetBiomeAtPoint(worldX, worldZ);
 
-                float noiseHeight = GenerateNoiseHeight(worldX, worldZ, octaveOffsets, biome);
-                if (noiseHeight <= biome.lowerThreshold)
-                    noiseHeight = 0;
+                BiomeBlend biomeBlend = GetBiomeBlend(worldX, worldZ);
 
-                SetMinMaxHeights(noiseHeight);
-                vertices[i] = new Vector3(x, noiseHeight, z);
+
+                float noiseHeightA = GenerateNoiseHeight(worldX, worldZ, offsetSeed, biomeBlend.biomeA);
+
+                float noiseHeightB = GenerateNoiseHeight(worldX, worldZ, offsetSeed, biomeBlend.biomeB);
+
+                float blendedHeight = Mathf.Lerp(noiseHeightA, noiseHeightB, biomeBlend.blendValue);
+
+                float threshold = Mathf.Lerp(biomeBlend.biomeA.lowerThreshold, biomeBlend.biomeB.lowerThreshold, biomeBlend.blendValue);
+
+
+
+                if (blendedHeight <= threshold)
+                    blendedHeight = 0;
+
+                vertices[i] = new Vector3(x, blendedHeight, z);
+                SetMinMaxHeights(blendedHeight);
+
                 i++;
             }
         }
@@ -152,22 +201,34 @@ public class Terrain_Chunk : MonoBehaviour
         {
             for (int x = 0; x <= terrainSettings.sizeX; x++)
             {
-                // Convert local vertex to world position
                 float worldX =
                     (chunkX * terrainSettings.sizeX) + x;
 
                 float worldZ =
                     (chunkZ * terrainSettings.sizeZ) + z;
 
-                // Get biome at this vertex
-                Biome_Settings biome =
-                    GetBiomeAtPoint(worldX, worldZ);
+                BiomeBlend blend =
+                    GetBiomeBlend(worldX, worldZ);
 
-                // Normalize height
-                float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
+                float height =
+                    Mathf.InverseLerp(
+                        minTerrainheight,
+                        maxTerrainheight,
+                        vertices[i].y);
 
-                // Use biome gradient
-                colours[i] = biome.gradient.Evaluate(height);
+                Color colorA =
+                    blend.biomeA.gradient.Evaluate(height);
+
+                Color colorB =
+                    blend.biomeB.gradient.Evaluate(height);
+
+                Color finalColor =
+                    Color.Lerp(
+                        colorA,
+                        colorB,
+                        blend.blendValue);
+
+                colours[i] = finalColor;
 
                 i++;
             }
