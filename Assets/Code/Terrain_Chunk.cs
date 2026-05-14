@@ -69,8 +69,8 @@ public class Terrain_Chunk : MonoBehaviour
 
     private Biome_Settings GetBiomeAtPoint(float worldX, float worldZ)
     {
-        float biomeNoise = Mathf.PerlinNoise( worldX / 300 + biomeOffsetSeed.x, 
-            worldZ / 300 + biomeOffsetSeed.y);
+        float biomeNoise = Mathf.PerlinNoise( worldX / terrainSettings.biomeNoiseScale + biomeOffsetSeed.x, 
+            worldZ / terrainSettings.biomeNoiseScale + biomeOffsetSeed.y);
 
         currentBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
 

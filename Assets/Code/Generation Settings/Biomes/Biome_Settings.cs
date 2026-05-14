@@ -1,5 +1,13 @@
 using UnityEngine;
 
+public struct BiomeBlend
+{
+    public Biome_Settings biomeA;
+    public Biome_Settings biomeB;
+    public float blendValue;
+}
+
+
 [CreateAssetMenu(fileName = "new_biome", menuName = "New Biome", order = 3)]
 public class Biome_Settings : ScriptableObject
 {

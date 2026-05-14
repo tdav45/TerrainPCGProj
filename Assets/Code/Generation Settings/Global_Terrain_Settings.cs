@@ -12,6 +12,7 @@ public class Global_Terrain_Settings : ScriptableObject
     public float basePersistence; //Base persistence for the noise
     public float lacunarity; //Lacunarity for the nosie
     public Material material;
+    public float biomeNoiseScale; 
 
 
 }

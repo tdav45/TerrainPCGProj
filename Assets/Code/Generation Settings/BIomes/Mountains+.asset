@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Mountains+
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
-  material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -41,19 +40,19 @@ MonoBehaviour:
   gradient:
     serializedVersion: 2
     key0: {r: 0.030774897, g: 0.1981132, b: 0, a: 1}
-    key1: {r: 0.1448954, g: 0.19366942, b: 0.09517236, a: 1}
-    key2: {r: 0.23315056, g: 0.19023281, b: 0.16877396, a: 0}
-    key3: {r: 0.21698111, g: 0.17126496, b: 0.1484069, a: 0}
-    key4: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 0}
-    key5: {r: 0.735849, g: 0.735849, b: 0.735849, a: 0}
+    key1: {r: 0, g: 0.6415094, b: 0.0022936047, a: 1}
+    key2: {r: 0.21698111, g: 0.17126496, b: 0.1484069, a: 0}
+    key3: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 0}
+    key4: {r: 0.735849, g: 0.735849, b: 0.735849, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 14456
-    ctime2: 25636
-    ctime3: 32575
-    ctime4: 51464
-    ctime5: 63415
+    ctime1: 17540
+    ctime2: 32575
+    ctime3: 51464
+    ctime4: 63415
+    ctime5: 0
     ctime6: 0
     ctime7: 0
     atime0: 0
@@ -66,7 +65,7 @@ MonoBehaviour:
     atime7: 0
     m_Mode: 0
     m_ColorSpace: -1
-    m_NumColorKeys: 6
+    m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   noiseScale: 35
   lowerThreshold: 1

@@ -21,3 +21,4 @@ MonoBehaviour:
   basePersistence: 0.5
   lacunarity: 2
   material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
+  biomeNoiseScale: 1000
