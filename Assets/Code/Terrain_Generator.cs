@@ -27,10 +27,10 @@ public class Terrain_Generator_Editor : Editor
             terrainGenerator.RemovePreviousGeneration();
         }
 
-/*        if (GUILayout.Button("Reset Is Generating"))
+       if (GUILayout.Button("Reset Is Generating"))
         {
             terrainGenerator.ResetIsGenerating();
-        }*/
+        }
 
     }
 }
@@ -96,15 +96,18 @@ public class Terrain_Generator : MonoBehaviour
     private int gridSize = 10;
     [SerializeField]
     private GameObject terrainHolder;
+    [SerializeField]
+    private Biome_Settings[] biomes;
+
 
     public Terrain_Generation_Settings terrain;
     public Noise_Settings noise;
 
     private bool isGenerating = false;
-
-
-
     private List<GameObject> generatedTerrainChunks;
+
+    private Noise_Settings localNoiseSettings;
+    private Terrain_Generation_Settings localTerrainSettings;
 
 
     //Get the offset seed for each octave
@@ -147,6 +150,35 @@ public class Terrain_Generator : MonoBehaviour
         }
     }
 
+    private Biome_Settings GetBiome()
+    {
+        if(biomes.Length == 0)
+        {
+            Debug.LogError("No biomes assigned to the terrain generator");
+            return null;
+        }
+        int r = Random.Range(0, biomes.Length);
+        Debug.Log("Selected biome: " + biomes[r].name);
+        return biomes[r];
+    }
+
+    private void AdjustSettingsByBiome()
+    {
+       //Temporary manual override
+        Biome_Settings biomeSettings = GetBiome();
+
+        //Create instance
+        // localTerrainSettings = ScriptableObject.CreateInstance<Terrain_Generation_Settings>();
+        localTerrainSettings = Instantiate(terrain);
+        localTerrainSettings.material = biomeSettings.material;
+        localTerrainSettings.heightCurve = biomeSettings.heightCurve;
+        localTerrainSettings.gradient = biomeSettings.gradient;
+
+        localNoiseSettings = Instantiate(noise);
+        localNoiseSettings.baseAmplitude = biomeSettings.baseAmplitude;
+
+    }
+
 
     //GENERATE TERRAIN (ENTRY POINT)//
     public void CreateNewTerrain(bool isRandomSeed)
@@ -163,18 +195,17 @@ public class Terrain_Generator : MonoBehaviour
                 RandomiseSeed();
             }
 
+            //Override settings by biome
+            AdjustSettingsByBiome();
+
             //Generate grid
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    NewChunk(i, j, terrainHolder);
+                    NewChunk(i, j, terrainHolder, GetBiome());
                 }
-
-
             }
-
-
 
             isGenerating = false;
         }
@@ -186,12 +217,12 @@ public class Terrain_Generator : MonoBehaviour
 
     }
 
-    private void NewChunk(int x, int z, GameObject parent)
+    private void NewChunk(int x, int z, GameObject parent, Biome_Settings biome)
     {
         var chunk = Instantiate(terrainChunkPrefab);
         chunk.transform.parent = parent.transform;
 
-        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(noise, terrain,
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(localNoiseSettings, localTerrainSettings,
             GetOffsetSeed(), x, z))
         {
             Debug.Log("New Chunk generated at: " + x + " " + z);
