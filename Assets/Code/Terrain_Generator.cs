@@ -167,7 +167,8 @@ public class Terrain_Generator : MonoBehaviour
 
     private void BiomeNoise()
     {
-        
+       // Generate noise map for biomes
+       //Intergrate GetBiome()
 
     }
 
