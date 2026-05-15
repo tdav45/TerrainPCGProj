@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Mountains
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
-  material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -37,7 +36,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 15
+  baseAmplitude: 50
   gradient:
     serializedVersion: 2
     key0: {r: 0.030774897, g: 0.1981132, b: 0, a: 1}
@@ -70,4 +69,4 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   noiseScale: 50
   lowerThreshold: 0.3
-  noiseThreshold: 0.6
+  noiseThreshold: 0.7

@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Plains
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
-  material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -79,4 +78,4 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   noiseScale: 80
   lowerThreshold: 0
-  noiseThreshold: 0.4
+  noiseThreshold: 0.3

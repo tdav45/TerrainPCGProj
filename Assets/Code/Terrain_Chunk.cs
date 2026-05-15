@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LightTransport;
 
@@ -67,57 +67,94 @@ public class Terrain_Chunk : MonoBehaviour
             minTerrainheight = noiseHeight;
     }
 
-    private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
+
+
+    private float GetBiomeNoise(float worldX, float worldZ)
     {
         float frequency = terrainSettings.biomeFrequency;
         float amplitude = 1f;
 
         float biomeNoise = 0f;
-        float maxPossibleHeight = 0f;
+        float maxPossible = 0f;
 
         for (int i = 0; i < terrainSettings.biomeOctaves; i++)
         {
             float sampleX = worldX / terrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.x;
-
             float sampleZ = worldZ / terrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.y;
 
-            float perlin = Mathf.PerlinNoise(sampleX, sampleZ);
-
-            biomeNoise += perlin * amplitude;
-
-            maxPossibleHeight += amplitude;
+            biomeNoise += Mathf.PerlinNoise(sampleX, sampleZ) * amplitude;
+            maxPossible += amplitude;
 
             amplitude *= terrainSettings.biomePersistence;
             frequency *= terrainSettings.biomeLacunarity;
         }
 
-        biomeNoise /= maxPossibleHeight;
+        return biomeNoise / maxPossible;
+    }
 
+    private int GetRandomBiome(float biomeNoise)
+    {
         for (int i = 0; i < currentBiomes.Count - 1; i++)
         {
-            Biome_Settings a = currentBiomes[i];
-            Biome_Settings b = currentBiomes[i + 1];
+            if (biomeNoise < currentBiomes[i + 1].noiseThreshold)
+                return i;
+        }
+        return currentBiomes.Count - 1;
+    }
 
-            if (biomeNoise >= a.noiseThreshold && biomeNoise <= b.noiseThreshold)
-            {
-                float blend = Mathf.InverseLerp( a.noiseThreshold, b.noiseThreshold, biomeNoise);
+    private float GetBiomeEdgeFactor(float biomeNoise)
+    {
+        float minDist = float.MaxValue;
 
-                return new BiomeBlend
-                {
-                    biomeA = a,
-                    biomeB = b,
-                    blendValue = blend
-                };
-            }
+        for (int i = 0; i < currentBiomes.Count; i++)
+        {
+            float dist = Mathf.Abs(biomeNoise - currentBiomes[i].noiseThreshold);
+            minDist = Mathf.Min(minDist, dist);
+        }
+
+        // edge width controls how thick transitions are
+        float edgeWidth = 0.08f;
+
+        return 1f - Mathf.Clamp01(minDist / edgeWidth);
+    }
+
+
+    private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
+    {
+        float biomeNoise = GetBiomeNoise(worldX, worldZ);
+
+        int biomeIndex = GetRandomBiome(biomeNoise);
+
+        Biome_Settings biomeA = currentBiomes[biomeIndex];
+        Biome_Settings biomeB = currentBiomes[biomeIndex];
+
+        float blend = 0f;
+
+        // if not last biome, allow blending into next
+        if (biomeIndex < currentBiomes.Count - 1)
+        {
+            Biome_Settings nextBiome = currentBiomes[biomeIndex + 1];
+
+            float thresholdA = biomeA.noiseThreshold;
+            float thresholdB = nextBiome.noiseThreshold;
+
+            float t = Mathf.InverseLerp(thresholdA, thresholdB, biomeNoise);
+
+            float edge = GetBiomeEdgeFactor(biomeNoise);
+
+            blend = t * edge;
+
+            biomeB = nextBiome;
         }
 
         return new BiomeBlend
         {
-            biomeA = currentBiomes[0],
-            biomeB = currentBiomes[0],
-            blendValue = 0
+            biomeA = biomeA,
+            biomeB = biomeB,
+            blendValue = blend
         };
     }
+
 
 
 
@@ -201,32 +238,19 @@ public class Terrain_Chunk : MonoBehaviour
         {
             for (int x = 0; x <= terrainSettings.sizeX; x++)
             {
-                float worldX =
-                    (chunkX * terrainSettings.sizeX) + x;
+                float worldX = (chunkX * terrainSettings.sizeX) + x;
 
-                float worldZ =
-                    (chunkZ * terrainSettings.sizeZ) + z;
+                float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
-                BiomeBlend blend =
-                    GetBiomeBlend(worldX, worldZ);
+                BiomeBlend blend = GetBiomeBlend(worldX, worldZ);
 
-                float height =
-                    Mathf.InverseLerp(
-                        minTerrainheight,
-                        maxTerrainheight,
-                        vertices[i].y);
+                float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight, vertices[i].y);
 
-                Color colorA =
-                    blend.biomeA.gradient.Evaluate(height);
+                Color colorA = blend.biomeA.gradient.Evaluate(height);
 
-                Color colorB =
-                    blend.biomeB.gradient.Evaluate(height);
+                Color colorB = blend.biomeB.gradient.Evaluate(height);
 
-                Color finalColor =
-                    Color.Lerp(
-                        colorA,
-                        colorB,
-                        blend.blendValue);
+                Color finalColor = Color.Lerp(colorA, colorB, blend.blendValue);
 
                 colours[i] = finalColor;
 
