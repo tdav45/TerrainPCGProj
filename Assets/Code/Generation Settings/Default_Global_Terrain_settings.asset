@@ -12,18 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a70c9508a3911249b7cb64903d05b3f, type: 3}
   m_Name: Default_Global_Terrain_settings
   m_EditorClassIdentifier: Assembly-CSharp::Global_Terrain_Settings
-  sizeX: 128
-  sizeZ: 128
+  sizeX: 64
+  sizeZ: 64
   meshScale: 1
   octaves: 20
-  seed: 927
+  seed: 187
   baseFrequency: 1
   basePersistence: 0.5
   lacunarity: 2
   material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   biomeNoiseScale: 100
-  biomeOctaves: 5
-  biomePersistence: 0.3
+  biomeOctaves: 4
+  biomePersistence: 0.5
   biomeLacunarity: 2
   biomeFrequency: 1
-  biomeBlendWidth: 0.2
