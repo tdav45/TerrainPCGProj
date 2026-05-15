@@ -28,7 +28,7 @@ public class Terrain_Chunk : MonoBehaviour
     {
         if (mesh == null)
         {
-            Debug.Log("Creating new mesh");
+            //Debug.Log("Creating new mesh");
             mesh = new Mesh();
             GetComponent<MeshFilter>().mesh = mesh;
         }
