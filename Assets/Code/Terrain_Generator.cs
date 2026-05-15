@@ -108,11 +108,35 @@ public class Terrain_Generator : MonoBehaviour
     {
         if (generatedTerrainChunks != null)
         {
-            foreach (GameObject terrain in generatedTerrainChunks)
+            if (generatedTerrainChunks.Count > 0)
             {
-                DestroyImmediate(terrain);
+                foreach (GameObject terrain in generatedTerrainChunks)
+                {
+                    DestroyImmediate(terrain);
+                }
+            }
+
+            else
+            {
+                if (terrainHolder.transform.childCount > 0)
+                {
+                    List<GameObject> oldChunks = new List<GameObject>(); 
+                    
+                    foreach (Transform child in terrainHolder.transform)
+                    {
+                        oldChunks.Add(child.gameObject);
+                       
+                    }
+
+                    foreach (GameObject obj in oldChunks)
+                    {
+                        DestroyImmediate(obj.gameObject);
+                    }
+                }
             }
         }
+
+     
 
         generatedTerrainChunks = new List<GameObject>();
 
