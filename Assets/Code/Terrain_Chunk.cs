@@ -67,6 +67,7 @@ public class Terrain_Chunk : MonoBehaviour
             minTerrainheight = noiseHeight;
     }
 
+    // Returns a Biome blend for the two biomes affecting a world point
     private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     {
         float frequency = terrainSettings.biomeFrequency;
@@ -98,9 +99,27 @@ public class Terrain_Chunk : MonoBehaviour
             Biome_Settings a = currentBiomes[i];
             Biome_Settings b = currentBiomes[i + 1];
 
-            if (biomeNoise >= a.noiseThreshold && biomeNoise <= b.noiseThreshold)
+            float border = b.noiseThreshold;
+
+            float blendStart = border - terrainSettings.biomeBlendWidth;
+
+            float blendEnd = border + terrainSettings.biomeBlendWidth;
+
+            if (biomeNoise < blendStart)
             {
-                float blend = Mathf.InverseLerp( a.noiseThreshold, b.noiseThreshold, biomeNoise);
+                return new BiomeBlend
+                {
+                    biomeA = a,
+                    biomeB = a,
+                    blendValue = 0
+                };
+            }
+
+            if (biomeNoise >= blendStart && biomeNoise <= blendEnd)
+            {
+                float blend = Mathf.InverseLerp(blendStart, blendEnd, biomeNoise);
+
+                blend = Mathf.SmoothStep(0, 1, blend);
 
                 return new BiomeBlend
                 {
@@ -109,6 +128,7 @@ public class Terrain_Chunk : MonoBehaviour
                     blendValue = blend
                 };
             }
+            
         }
 
         return new BiomeBlend
@@ -201,32 +221,26 @@ public class Terrain_Chunk : MonoBehaviour
         {
             for (int x = 0; x <= terrainSettings.sizeX; x++)
             {
-                float worldX =
-                    (chunkX * terrainSettings.sizeX) + x;
+                float worldX = (chunkX * terrainSettings.sizeX) + x;
+                float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
-                float worldZ =
-                    (chunkZ * terrainSettings.sizeZ) + z;
+                BiomeBlend blend = GetBiomeBlend(worldX, worldZ);
 
-                BiomeBlend blend =
-                    GetBiomeBlend(worldX, worldZ);
+                float height = Mathf.InverseLerp(minTerrainheight, maxTerrainheight,vertices[i].y);
 
-                float height =
-                    Mathf.InverseLerp(
-                        minTerrainheight,
-                        maxTerrainheight,
-                        vertices[i].y);
+                Color colorA = blend.biomeA.gradient.Evaluate(height);
+                Color colorB = blend.biomeB.gradient.Evaluate(height);
 
-                Color colorA =
-                    blend.biomeA.gradient.Evaluate(height);
+                // Smooth blend value
+                float colorBlend = Mathf.SmoothStep( 0, 1, blend.blendValue);
 
-                Color colorB =
-                    blend.biomeB.gradient.Evaluate(height);
+                // Adds noise to break up colour borders
+                float colorNoise = Mathf.PerlinNoise(worldX * 0.05f, worldZ * 0.05f);
+                colorBlend += (colorNoise - 0.5f) * 0.08f;
+                colorBlend = Mathf.Clamp01(colorBlend);
 
-                Color finalColor =
-                    Color.Lerp(
-                        colorA,
-                        colorB,
-                        blend.blendValue);
+                Color finalColor =Color.Lerp(colorA, colorB, colorBlend);
+
 
                 colours[i] = finalColor;
 
