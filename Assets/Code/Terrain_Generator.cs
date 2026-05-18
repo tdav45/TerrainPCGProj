@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -157,6 +158,49 @@ public class Terrain_Generator : MonoBehaviour
         }
     }
 
+    private void AssignBiomeThresholds()
+    {
+        var groups = allBiomes.GroupBy(b => b.order).OrderBy(g => g.Key) .ToList();
+
+        float current = 0f; 
+
+        foreach (var group in groups)
+        {
+
+            float totalPriority = group.Sum(b => b.priority);
+
+
+            foreach (var biome in group)
+            {
+                float slice = biome.priority / totalPriority;
+
+                biome.thresholdStart = current;
+                biome.thresholdEnd = current + slice;
+
+                current += slice;
+            }
+        }
+
+
+
+        foreach (var biome in allBiomes)
+        {
+            biome.thresholdStart /= current;
+            biome.thresholdEnd /= current;
+
+            biome.noiseThreshold = (biome.thresholdStart + biome.thresholdEnd) * 0.5f;
+            biome.noiseThreshold = Mathf.Round(biome.noiseThreshold * 10) / 10;
+        }
+
+        float minThreshold = allBiomes.Min(b => b.noiseThreshold);
+
+        foreach (var biome in allBiomes)
+        {
+            biome.noiseThreshold -= minThreshold;
+        }
+
+    }
+
     private void SetupBiomes()
     {
         allBiomes = new List<Biome_Settings>();
@@ -169,6 +213,9 @@ public class Terrain_Generator : MonoBehaviour
         {
             allBiomes.AddRange(biomePool);
         }
+
+        AssignBiomeThresholds();
+
     }
 
     //GENERATE TERRAIN (ENTRY POINT)//

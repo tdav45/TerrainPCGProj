@@ -16,6 +16,19 @@ public class Biome_Settings : ScriptableObject
     public Gradient gradient; //Colour gradient that applies to the material (Terrain)
     public float noiseScale;
     public float lowerThreshold; //Height threshold, any height lower will be set to 0
-    [Range(0.0f, 1.0f)]
-    public float noiseThreshold;
+    public int priority = 1;
+    [Range (0, 1f)]
+    public float order = 0;
+
+    public float noiseThreshold = 0;
+
+    [HideInInspector]
+    public float thresholdStart = 0;
+    [HideInInspector]
+    public float thresholdEnd = 1;
+
+
+
+
+
 }

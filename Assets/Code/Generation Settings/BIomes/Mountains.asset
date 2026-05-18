@@ -69,4 +69,8 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   noiseScale: 150
   lowerThreshold: 0.3
-  noiseThreshold: 0.7
+  priority: 2
+  order: 0.4
+  thresholdStart: 0.6666667
+  thresholdEnd: 0.8333333
+  noiseThreshold: 0.75
