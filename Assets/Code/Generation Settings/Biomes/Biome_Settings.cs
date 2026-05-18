@@ -1,5 +1,12 @@
 using UnityEngine;
 
+
+public class BiomeSeed
+{
+    public Vector2 position;
+    public Biome_Settings biome;
+}
+
 public struct BiomeBlend
 {
     public Biome_Settings biomeA;

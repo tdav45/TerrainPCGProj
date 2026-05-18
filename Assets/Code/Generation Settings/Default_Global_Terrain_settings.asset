@@ -16,12 +16,12 @@ MonoBehaviour:
   sizeZ: 128
   meshScale: 1
   octaves: 20
-  seed: 411
+  seed: 664
   baseFrequency: 1
   basePersistence: 0.5
   lacunarity: 2
   material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
-  biomeNoiseScale: 300
+  biomeNoiseScale: 600
   biomeOctaves: 4
   biomePersistence: 0.5
   biomeLacunarity: 2

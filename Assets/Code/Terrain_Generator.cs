@@ -55,6 +55,7 @@ public class Terrain_Generator : MonoBehaviour
     private bool isRandomSeed;
 
     private List<Biome_Settings> allBiomes; //All biome assets
+    private List<BiomeSeed> biomeSeeds;
     private bool isGenerating = false;
     private List<GameObject> generatedTerrainChunks;
 
@@ -159,6 +160,7 @@ public class Terrain_Generator : MonoBehaviour
 
     private void SetupBiomes()
     {
+        biomeSeeds = new List<BiomeSeed>();
         allBiomes = new List<Biome_Settings>();
 
         if (useAllBiomes)
@@ -169,6 +171,90 @@ public class Terrain_Generator : MonoBehaviour
         {
             allBiomes.AddRange(biomePool);
         }
+
+        System.Random prng = new System.Random(globalTerrainSettings.seed);
+
+        int seedCount = allBiomes.Count * 3; // tweak density
+
+        for (int i = 0; i < seedCount; i++)
+        {
+            Biome_Settings biome = allBiomes[prng.Next(allBiomes.Count)];
+
+            float worldSizeX = gridSize * globalTerrainSettings.sizeX;
+            float worldSizeZ = gridSize * globalTerrainSettings.sizeZ;
+
+            Vector2 pos = new Vector2(prng.Next(0, (int)worldSizeX),prng.Next(0, (int)worldSizeZ));
+
+            biomeSeeds.Add(new BiomeSeed{position = pos,biome = biome});
+        }
+    }
+
+    private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
+    {
+        Vector2 pos = new Vector2(worldX, worldZ);
+
+        float closestDist = float.MaxValue;
+        float secondClosestDist = float.MaxValue;
+
+        BiomeSeed closest = null;
+        BiomeSeed second = null;
+
+        // find nearest 2 seeds
+        foreach (var seed in biomeSeeds)
+        {
+            float d = Vector2.SqrMagnitude(pos - seed.position);
+
+            if (d < closestDist)
+            {
+                secondClosestDist = closestDist;
+                second = closest;
+
+                closestDist = d;
+                closest = seed;
+            }
+            else if (d < secondClosestDist)
+            {
+                secondClosestDist = d;
+                second = seed;
+            }
+        }
+
+        // safety fallback
+        if (closest == null || second == null)
+        {
+            return new BiomeBlend
+            {
+                biomeA = allBiomes[0],
+                biomeB = allBiomes[0],
+                blendValue = 0
+            };
+        }
+
+        Biome_Settings biomeA = closest.biome;
+        Biome_Settings biomeB = second.biome;
+
+        float distA = Mathf.Sqrt(closestDist);
+        float distB = Mathf.Sqrt(secondClosestDist);
+
+        float borderDistance = Mathf.Abs(distA - distB);
+
+        float edgeWidth = 15f;
+
+        float blend = 1f - Mathf.Clamp01(borderDistance / edgeWidth);
+
+        blend = Mathf.SmoothStep(0, 1, blend);
+
+        return new BiomeBlend
+        {
+            biomeA = biomeA,
+            biomeB = biomeB,
+            blendValue = blend
+        };
+    }
+
+    public BiomeBlend SampleBiome(float worldX, float worldZ)
+    {
+        return GetBiomeBlend(worldX, worldZ);
     }
 
     //GENERATE TERRAIN (ENTRY POINT)//
@@ -222,8 +308,8 @@ public class Terrain_Generator : MonoBehaviour
         var chunk = Instantiate(terrainChunkPrefab);
         chunk.transform.parent = parent.transform;
 
-        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, allBiomes,
-            offsetSeed, biomeOffsetSeed, x, z))
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(this, globalTerrainSettings,
+            offsetSeed, x, z))
         {
            // Debug.Log("New Chunk generated at: " + x + " " + z);
         }
