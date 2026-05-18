@@ -143,6 +143,25 @@ public class Terrain_Generator : MonoBehaviour
 
     }
 
+    private Vector2 WarpPosition(float worldX, float worldZ)
+    {
+        float warpX = Mathf.PerlinNoise(
+            worldX / globalTerrainSettings.warpScale,
+            worldZ / globalTerrainSettings.warpScale
+        ) * 2 - 1;
+
+        float warpZ = Mathf.PerlinNoise(
+            (worldX + 1000) / globalTerrainSettings.warpScale,
+            (worldZ + 1000) / globalTerrainSettings.warpScale
+        ) * 2 - 1;
+
+        return new Vector2(
+            worldX + warpX * globalTerrainSettings.warpStrength,
+            worldZ + warpZ * globalTerrainSettings.warpStrength
+        );
+    }
+
+
     private void MakeBiomePool()
     {
         foreach (var biome in AssetDatabase.FindAssets("t:Biome_Settings", new[] { "Assets/Code/Generation Settings/Biomes" }))
@@ -191,7 +210,7 @@ public class Terrain_Generator : MonoBehaviour
 
     private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     {
-        Vector2 pos = new Vector2(worldX, worldZ);
+        Vector2 pos = WarpPosition(worldX, worldZ);
 
         float closestDist = float.MaxValue;
         float secondClosestDist = float.MaxValue;
