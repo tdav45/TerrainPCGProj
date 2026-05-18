@@ -17,6 +17,7 @@ public class Global_Terrain_Settings : ScriptableObject
     public float biomePersistence = 0.5f;
     public float biomeLacunarity = 2f;
     public float biomeFrequency = 1f;
+    public float biomeBlendDistance = 30f;
     public float warpStrength = 40f;
     public float warpScale = 200f;
 

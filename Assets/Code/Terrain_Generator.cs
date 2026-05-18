@@ -210,63 +210,88 @@ public class Terrain_Generator : MonoBehaviour
 
     private BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     {
-        Vector2 pos = WarpPosition(worldX, worldZ);
-
-        float closestDist = float.MaxValue;
-        float secondClosestDist = float.MaxValue;
+        Vector2 pos = new Vector2(worldX, worldZ);
 
         BiomeSeed closest = null;
-        BiomeSeed second = null;
+        float closestDist = float.MaxValue;
 
-        // find nearest 2 seeds
         foreach (var seed in biomeSeeds)
         {
             float d = Vector2.SqrMagnitude(pos - seed.position);
 
             if (d < closestDist)
             {
-                secondClosestDist = closestDist;
-                second = closest;
-
                 closestDist = d;
                 closest = seed;
             }
-            else if (d < secondClosestDist)
-            {
-                secondClosestDist = d;
-                second = seed;
-            }
         }
 
-        // safety fallback
-        if (closest == null || second == null)
+        // Safety fallback
+        if (closest == null)
         {
             return new BiomeBlend
             {
                 biomeA = allBiomes[0],
                 biomeB = allBiomes[0],
-                blendValue = 0
+                blendValue = 0f
             };
         }
 
-        Biome_Settings biomeA = closest.biome;
-        Biome_Settings biomeB = second.biome;
+        float edgeThreshold = globalTerrainSettings.biomeBlendDistance;
+        float edgeThresholdSq = edgeThreshold * edgeThreshold;
+
+
+        if (closestDist > edgeThresholdSq)
+        {
+            return new BiomeBlend
+            {
+                biomeA = closest.biome,
+                biomeB = closest.biome,
+                blendValue = 0f
+            };
+        }
+
+
+        BiomeSeed second = null;
+        float secondDist = float.MaxValue;
+
+        foreach (var seed in biomeSeeds)
+        {
+            if (seed == closest) continue;
+
+            float d = Vector2.SqrMagnitude(pos - seed.position);
+
+            if (d < secondDist)
+            {
+                secondDist = d;
+                second = seed;
+            }
+        }
+
+
+        if (second == null)
+        {
+            return new BiomeBlend
+            {
+                biomeA = closest.biome,
+                biomeB = closest.biome,
+                blendValue = 0f
+            };
+        }
+
 
         float distA = Mathf.Sqrt(closestDist);
-        float distB = Mathf.Sqrt(secondClosestDist);
+        float distB = Mathf.Sqrt(secondDist);
 
-        float borderDistance = Mathf.Abs(distA - distB);
+        float borderDistance = Mathf.Abs(distB - distA);
 
-        float edgeWidth = 15f;
-
-        float blend = 1f - Mathf.Clamp01(borderDistance / edgeWidth);
-
-        blend = Mathf.SmoothStep(0, 1, blend);
+        float blend = 1f - Mathf.Clamp01(borderDistance / edgeThreshold);
+        blend = Mathf.SmoothStep(0f, 1f, blend);
 
         return new BiomeBlend
         {
-            biomeA = biomeA,
-            biomeB = biomeB,
+            biomeA = closest.biome,
+            biomeB = second.biome,
             blendValue = blend
         };
     }
