@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Ocean
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
+  biomeName: 2
   heightCurve:
     serializedVersion: 2
     m_Curve:

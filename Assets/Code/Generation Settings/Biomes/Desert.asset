@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Desert
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
+  biomeName: 3
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -80,6 +81,12 @@ MonoBehaviour:
   lowerThreshold: 0.04
   priority: 1
   order: 0.1
+  noiseThreshold: 0.1
+  spawnPrefabs:
+  - {fileID: 2560457701353787104, guid: 09d956f47aa4998478686e27125056ba, type: 3}
+  - {fileID: 3524742602163404321, guid: 07be10221ed3b9e4aac2b1394ca1ef7b, type: 3}
+  spawnThreshold: 0.8
+  spawnNoiseScale: 0.05
+  spawnNoiseOffset: 1000
   thresholdStart: 0.16666667
   thresholdEnd: 0.33333334
-  noiseThreshold: 0.25
