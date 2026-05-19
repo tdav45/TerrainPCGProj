@@ -47,6 +47,8 @@ public class Terrain_Generator : MonoBehaviour
     [SerializeField]
     private GameObject terrainHolder;
     [SerializeField]
+    private Asset_Spawner assetSpawner;
+    [SerializeField]
     private Global_Terrain_Settings globalTerrainSettings; //Global settings that apply to all chunks/biomes
     [SerializeField]
     private Biome_Settings[] biomePool; // Array of biome settings to randomly select from when generating terrain
@@ -56,10 +58,119 @@ public class Terrain_Generator : MonoBehaviour
     private bool isRandomSeed;
 
     private List<Biome_Settings> allBiomes; //All biome assets
-    private bool isGenerating = false;
     private List<GameObject> generatedTerrainChunks;
+  
+    private bool isGenerating = false;
+   
+    private Vector2[] octaveOffsets;
+    private Vector2 biomeOffsetSeed;
 
 
+    public float GetBiomeNoise(float worldX, float worldZ)
+    {
+        float frequency = globalTerrainSettings.biomeFrequency;
+        float amplitude = 1f;
+
+        float biomeNoise = 0f;
+        float maxPossible = 0f;
+
+        for (int i = 0; i < globalTerrainSettings.biomeOctaves; i++)
+        {
+            float sampleX = worldX / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.x;
+            float sampleZ = worldZ / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.y;
+
+            biomeNoise += Mathf.PerlinNoise(sampleX, sampleZ) * amplitude;
+
+            maxPossible += amplitude;
+
+            amplitude *= globalTerrainSettings.biomePersistence;
+            frequency *= globalTerrainSettings.biomeLacunarity;
+        }
+
+        return biomeNoise / maxPossible;
+    }
+    public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
+    {
+        float biomeNoise = GetBiomeNoise(worldX, worldZ);
+
+        int biomeIndex = GetBiomeIndex(biomeNoise);
+
+        Biome_Settings biomeA = allBiomes[biomeIndex];
+        Biome_Settings biomeB = allBiomes[biomeIndex];
+
+        float blend = 0f;
+
+        if (biomeIndex < allBiomes.Count - 1)
+        {
+            Biome_Settings nextBiome = allBiomes[biomeIndex + 1];
+
+            float thresholdA = biomeA.noiseThreshold;
+            float thresholdB = nextBiome.noiseThreshold;
+
+            float t = Mathf.InverseLerp(thresholdA, thresholdB, biomeNoise);
+
+            float edge = GetBiomeEdgeFactor(biomeNoise);
+
+            blend = t * edge;
+
+            biomeB = nextBiome;
+        }
+
+        return new BiomeBlend
+        {
+            biomeA = biomeA,
+            biomeB = biomeB,
+            blendValue = blend
+        };
+    }
+    private int GetBiomeIndex(float biomeNoise)
+    {
+        for (int i = 0; i < allBiomes.Count - 1; i++)
+        {
+            if (biomeNoise < allBiomes[i + 1].noiseThreshold)
+                return i;
+        }
+
+        return allBiomes.Count - 1;
+    }
+    private float GetBiomeEdgeFactor(float biomeNoise)
+    {
+        float minDist = float.MaxValue;
+
+        foreach (var biome in allBiomes)
+        {
+            float dist = Mathf.Abs(biomeNoise - biome.noiseThreshold);
+            minDist = Mathf.Min(minDist, dist);
+        }
+
+        float edgeWidth = 0.08f;
+
+        return 1f - Mathf.Clamp01(minDist / edgeWidth);
+    }
+    public float GenerateNoiseHeight(float x, float z, Biome_Settings biome)
+    {
+        float frequency = globalTerrainSettings.baseFrequency;
+        float persistence = globalTerrainSettings.basePersistence;
+        float amplitude = biome.baseAmplitude;
+
+        float noiseValue = 0f;
+        float heightValue = 0f;
+
+        for (int i = 0; i < globalTerrainSettings.octaves; i++)
+        {
+            float sampleZ = z / biome.noiseScale * frequency + octaveOffsets[i].y;
+            float sampleX = x / biome.noiseScale * frequency + octaveOffsets[i].x;
+
+            noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
+
+            heightValue += biome.heightCurve.Evaluate(noiseValue) * amplitude;
+
+            amplitude *= persistence;
+            frequency *= globalTerrainSettings.lacunarity;
+        }
+
+        return heightValue;
+    }
 
     //Get the offset seed for each octave
     private Vector2[] GetOffsetSeed()
@@ -80,7 +191,7 @@ public class Terrain_Generator : MonoBehaviour
         return offsetSeed;
     }
 
-    private Vector2 BiomeOffsetSeed()
+    private Vector2 GenerateBiomeOffsetSeed()
     {
         System.Random prng = new System.Random(globalTerrainSettings.seed);
         Vector2 biomeOffset;
@@ -216,6 +327,8 @@ public class Terrain_Generator : MonoBehaviour
 
         AssignBiomeThresholds();
 
+        allBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
+
     }
 
     //GENERATE TERRAIN (ENTRY POINT)//
@@ -233,24 +346,19 @@ public class Terrain_Generator : MonoBehaviour
                 RandomiseSeed();
             }
 
-            //Override settings by biome
-            //AdjustSettingsByBiome();
-
             SetupBiomes();
 
-            Vector2[] offsetSeed = GetOffsetSeed();
-            Vector2 biomeOffsetSeed = BiomeOffsetSeed();
-
-            
-
-            allBiomes.Sort((a, b) => a.noiseThreshold.CompareTo(b.noiseThreshold));
+            octaveOffsets = GetOffsetSeed();
+            biomeOffsetSeed = GenerateBiomeOffsetSeed();
 
             //Generate grid
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    NewChunk(i, j, terrainHolder, offsetSeed, biomeOffsetSeed);
+                    //  NewChunk(i, j, terrainHolder, offsetSeed, biomeOffsetSeed);
+                    NewChunk(i, j);
+        
                 }
             }
 
@@ -264,15 +372,18 @@ public class Terrain_Generator : MonoBehaviour
 
     }
 
-    private void NewChunk(int x, int z, GameObject parent, Vector2[] offsetSeed, Vector2 biomeOffsetSeed)
+    private void NewChunk(int x, int z)
     {
         var chunk = Instantiate(terrainChunkPrefab);
-        chunk.transform.parent = parent.transform;
+        chunk.transform.parent = terrainHolder.transform;
 
-        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(globalTerrainSettings, allBiomes,
-            offsetSeed, biomeOffsetSeed, x, z))
+        if (chunk.GetComponent<Terrain_Chunk>().CreateNewTerrainChunk(
+           this,
+           globalTerrainSettings,
+           x, z))
         {
-           // Debug.Log("New Chunk generated at: " + x + " " + z);
+            // Debug.Log("New Chunk generated at: " + x + " " + z);
+
         }
 
         generatedTerrainChunks.Add(chunk);
