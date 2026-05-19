@@ -2,29 +2,32 @@
 using UnityEngine;
 using UnityEngine.LightTransport;
 
-
+// Terrain chunk class //
 public class Terrain_Chunk : MonoBehaviour
 {
-    private Terrain_Generator terrainGenerator;
-    private Global_Terrain_Settings terrainSettings;
-    private List<Biome_Settings> currentBiomes; //biomes being used
+    private Terrain_Generator terrainGenerator; // Terrain generator reference
 
-    private int chunkX, chunkZ;
+    private Global_Terrain_Settings terrainSettings; // Global settings that apply to all chunks/biomes 
+    private List<Biome_Settings> currentBiomes; // Biomes being used
+    private bool spawnAssets = false; // Whether to spawn assets on this chunk, set in the world generator when creating the chunk
 
-    private Mesh mesh;
-    private Vector3[] vertices;
-    private int[] triangles;
+    private int chunkX, chunkZ; // Coordinates of the chunk
 
-    private float minTerrainheight;
-    private float maxTerrainheight;
+    private Mesh mesh; // Mesh of the chunk
+    private Vector3[] vertices; // Vertices of the mesh
+    private int[] triangles; // Triangles of the mesh, each group of 3 integers represents a triangle
 
-    private Color[] colours;
+    private float minTerrainheight; // Used for color gradient, minimum height of the terrain
+    private float maxTerrainheight; // Used for color gradient, maximum height of the terrain
 
-    private float[,] heightMap;
-    private BiomeBlend[,] biomeMap;
+    private Color[] colours; // Colours of the mesh, each vertex has a corresponding colour used in the material
 
-    private Asset_Spawner assetSpawner;
+    private float[,] heightMap; // Height map of the chunk, used for asset spawning
+    private BiomeBlend[,] biomeMap; // Biome map of the chunk, used for asset spawning
 
+    private Asset_Spawner assetSpawner; // Asset spawner reference
+
+    // Assign mesh to the chunk, if it doesn't already have one
     private void AssignMesh()
     {
         if (mesh == null)
@@ -34,7 +37,8 @@ public class Terrain_Chunk : MonoBehaviour
             GetComponent<MeshFilter>().mesh = mesh;
         }
     }
-   
+
+    // Set the min and max heights of the terrain, used for the color gradient
     private void SetMinMaxHeights(float noiseHeight)
     {
         // Set min and max height of map for color gradient
@@ -44,10 +48,7 @@ public class Terrain_Chunk : MonoBehaviour
             minTerrainheight = noiseHeight;
     }
 
-
-
-
-    // Create the actual mesh shape by assigning vertices, uses GenerateNoiseHeight and SetMinMaxHeights //
+    // Create the actual mesh shape by assigning vertices
     private void CreateMeshShape()
     {
         int width = terrainSettings.sizeX + 1;
@@ -61,9 +62,6 @@ public class Terrain_Chunk : MonoBehaviour
         minTerrainheight = float.MaxValue;
         maxTerrainheight = float.MinValue;
 
-
-
-
         for (int i = 0, z = 0; z <= terrainSettings.sizeZ; z++)
         {
             for (int x = 0; x <= terrainSettings.sizeX; x++)
@@ -73,19 +71,18 @@ public class Terrain_Chunk : MonoBehaviour
                 float worldX = (chunkX * terrainSettings.sizeX) + x;
                 float worldZ = (chunkZ * terrainSettings.sizeZ) + z;
 
-                //Biome_Settings biome = GetBiomeAtPoint(worldX, worldZ);
-
+                // Get the biome blend for this point
                 BiomeBlend biomeBlend = terrainGenerator.GetBiomeBlend(worldX, worldZ);
                 biomeMap[x, z] = biomeBlend;
 
+                // Get the noise height for both biomes and blend them together
                 float noiseHeightA = terrainGenerator.GenerateNoiseHeight(worldX, worldZ, biomeBlend.biomeA);
-
                 float noiseHeightB = terrainGenerator.GenerateNoiseHeight(worldX, worldZ, biomeBlend.biomeB);
 
                 float blendedHeight = Mathf.Lerp(noiseHeightA, noiseHeightB, biomeBlend.blendValue);
-
                 float threshold = Mathf.Lerp(biomeBlend.biomeA.lowerThreshold, biomeBlend.biomeB.lowerThreshold, biomeBlend.blendValue);
 
+                // Set height to 0 if it's below the threshold, creating flat areas in the terrain
                 if (blendedHeight <= threshold)
                 {
                     blendedHeight = 0;
@@ -100,6 +97,7 @@ public class Terrain_Chunk : MonoBehaviour
             }
         }
     }
+    // Create triangles of the mesh by assigning integers to the triangle array
     private void CreateTriangles()
     {
         // Need 6 vertices to create a square (2 triangles)
@@ -126,8 +124,7 @@ public class Terrain_Chunk : MonoBehaviour
             vert++;
         }
     }
-
-
+    // Colour the terrain by assigning a colour to each vertex based on the height and biome blend at that point
     private void ColourTerrain()
     {
         colours = new Color[vertices.Length];
@@ -155,6 +152,7 @@ public class Terrain_Chunk : MonoBehaviour
     {
         if (mesh) mesh.Clear();
     }
+    // Update the mesh with the new vertices, triangles and colours, and recalculate normals and tangents for lighting
     private void UpdateMesh()
     {
         ClearMesh();
@@ -164,8 +162,6 @@ public class Terrain_Chunk : MonoBehaviour
 
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
-        mesh.RecalculateBounds();
-        mesh.RecalculateUVDistributionMetrics();
 
         mesh.name = "terrain_mesh";
 
@@ -189,12 +185,15 @@ public class Terrain_Chunk : MonoBehaviour
     public bool CreateNewTerrainChunk(
          Terrain_Generator generator,
         Global_Terrain_Settings settings,
+        bool useAssetSpawning,
         int x,int z) //Coordinates of the chunk
     {
         //Assign variables
 
         terrainGenerator = generator;
         terrainSettings = settings;
+
+        spawnAssets = useAssetSpawning;
 
         chunkX = x;
         chunkZ = z;
@@ -204,12 +203,11 @@ public class Terrain_Chunk : MonoBehaviour
         //Call generate mesh
         GenerateMesh();
 
-
-
         return true;
 
     }
 
+    // Main function that calls all the other functions in the correct order to generate the mesh and spawn assets
     private void GenerateMesh()
     {
         //Generate Mesh
@@ -218,7 +216,11 @@ public class Terrain_Chunk : MonoBehaviour
         CreateTriangles();
         ColourTerrain();
         UpdateMesh();
-        assetSpawner.SpawnAssets(this, terrainSettings, biomeMap, heightMap, chunkX, chunkZ);
+
+        if (spawnAssets)
+        {
+            assetSpawner.SpawnAssets(this, terrainSettings, biomeMap, heightMap, chunkX, chunkZ);
+        }
     }
 
 

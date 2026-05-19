@@ -16,7 +16,7 @@ MonoBehaviour:
   sizeZ: 128
   meshScale: 1
   octaves: 20
-  seed: 411
+  seed: 79
   baseFrequency: 1
   basePersistence: 0.5
   lacunarity: 2
@@ -26,3 +26,4 @@ MonoBehaviour:
   biomePersistence: 0.5
   biomeLacunarity: 2
   biomeFrequency: 1
+  biomeEdgeWidth: 0.06
