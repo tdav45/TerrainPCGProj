@@ -89,7 +89,11 @@ public class Terrain_Generator : MonoBehaviour
             float sampleX = worldX / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.x;
             float sampleZ = worldZ / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.y;
 
-            biomeNoise += Mathf.PerlinNoise(sampleX, sampleZ) * amplitude;
+
+            FastNoiseLite noise = new FastNoiseLite();
+            noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+            
+            biomeNoise += noise.GetNoise(sampleX, sampleZ) * amplitude;
 
             maxPossible += amplitude;
 
@@ -251,8 +255,6 @@ public class Terrain_Generator : MonoBehaviour
     #endregion
 
     #region Utility
-
-
 
     // Randomise the seed value
     public void RandomiseSeed()
