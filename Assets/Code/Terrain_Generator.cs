@@ -246,8 +246,15 @@ public class Terrain_Generator : MonoBehaviour
     {
         if (assetSpawner == null)
         {
-            assetSpawner = gameObject.AddComponent<Asset_Spawner>();   
+            if (gameObject.GetComponent<Asset_Spawner>() == null)
+            {
+                assetSpawner = gameObject.AddComponent<Asset_Spawner>();
+            }
+
+            assetSpawner = GetComponent<Asset_Spawner>();   
         }
+        
+      
 
         assetSpawner.SetAssetSpawningSettings(globalTerrainSettings.spawnSpacing, globalTerrainSettings.maxSlope);
     }
