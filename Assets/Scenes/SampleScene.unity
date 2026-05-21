@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 24418425}
   - component: {fileID: 24418426}
   - component: {fileID: 24418427}
+  - component: {fileID: 24418428}
   m_Layer: 0
   m_Name: Terrain_Generator
   m_TagString: Untagged
@@ -176,6 +177,18 @@ MonoBehaviour:
   isRandomSeed: 1
   useAssetSpawning: 1
 --- !u!114 &24418427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24418423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d65deb9ab7cf3b14a8ed765873813db0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Asset_Spawner
+--- !u!114 &24418428
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -73,5 +73,9 @@ MonoBehaviour:
   priority: 7
   order: 0
   noiseThreshold: 0
+  spawnPrefabs: []
+  spawnThreshold: 0.7
+  spawnNoiseScale: 0
+  spawnNoiseOffset: 1000
   thresholdStart: 0
   thresholdEnd: 0.16666667

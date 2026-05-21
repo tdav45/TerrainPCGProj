@@ -52,13 +52,24 @@ public class Asset_Spawner : MonoBehaviour
         float worldX = (chunkX * settings.sizeX) + localX;
         float worldZ = (chunkZ * settings.sizeZ) + localZ;
 
-        // Use Perlin noise to determine whether to spawn an object at this point, using the world coordinates and the biome's spawn noise settings
-        float spawnNoise = Mathf.PerlinNoise(
+
+        FastNoiseLite noise = new FastNoiseLite();
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
+
+        // Sample the biome noise at this point to determine the biome distribution, using the world coordinates and the biome's spawn noise settings
+        float sampleX = (worldX + biome.spawnNoiseOffset) * biome.spawnNoiseScale;
+        float sampleZ = (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale;   
+       
+/*        float spawnNoise = Mathf.PerlinNoise(
             (worldX + biome.spawnNoiseOffset) * biome.spawnNoiseScale,
-            (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale);
+            (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale);*/
+
+        float spawnNoise = noise.GetNoise(sampleX, sampleZ);
+
 
         if (spawnNoise < biome.spawnThreshold)
             return;
+
 
         // Use a seeded random number generator to select a prefab to spawn, using the world coordinates as the seed to ensure consistent spawning across runs
         int hash = worldX.GetHashCode() ^ worldZ.GetHashCode();
