@@ -37,7 +37,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 100
+  baseAmplitude: 50
   gradient:
     serializedVersion: 2
     key0: {r: 0.030774897, g: 0.1981132, b: 0, a: 1}
@@ -68,7 +68,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  noiseScale: 50
+  noiseScale: 2
   lowerThreshold: 0
   priority: 2
   order: 0.4

@@ -200,7 +200,15 @@ public class Terrain_Generator : MonoBehaviour
             float sampleZ = z / biome.noiseScale * frequency + octaveOffsets[i].y;
             float sampleX = x / biome.noiseScale * frequency + octaveOffsets[i].x;
 
-            noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
+
+            FastNoiseLite noise = new FastNoiseLite();
+            noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+
+           
+
+            //noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
+
+             noiseValue = noise.GetNoise(sampleX, sampleZ) * 2 - 1;
 
             // Evaluate the biome's height curve at the noise value to get a height multiplier, and multiply it by the amplitude to get the height contribution of this octave
             heightValue += biome.heightCurve.Evaluate(noiseValue) * amplitude;

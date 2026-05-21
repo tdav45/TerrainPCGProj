@@ -68,7 +68,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
-  noiseScale: 150
+  noiseScale: 1
   lowerThreshold: 0.2
   priority: 1
   order: 0.5
