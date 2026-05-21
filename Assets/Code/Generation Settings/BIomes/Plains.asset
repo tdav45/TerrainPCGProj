@@ -87,7 +87,7 @@ MonoBehaviour:
   - {fileID: 5546181887698506422, guid: 65058a1305d50c041b1e6ab2c7180733, type: 3}
   - {fileID: 6996789656231951248, guid: c5e680738352b2e46ada92f8b7685a9c, type: 3}
   spawnThreshold: 0.6
-  spawnNoiseScale: 0.2
+  spawnNoiseScale: 0.4
   spawnNoiseOffset: 1000
   thresholdStart: 0.33333334
   thresholdEnd: 0.5

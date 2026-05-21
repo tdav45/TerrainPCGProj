@@ -234,8 +234,10 @@ public class Terrain_Generator : MonoBehaviour
     {
         if (assetSpawner == null)
         {
-            assetSpawner = gameObject.AddComponent<Asset_Spawner>();
+            assetSpawner = gameObject.AddComponent<Asset_Spawner>();   
         }
+
+        assetSpawner.SetAssetSpawningSettings(globalTerrainSettings.spawnSpacing, globalTerrainSettings.maxSlope);
     }
 
     public void SpawnAssetsInChunk(Terrain_Chunk chunk, BiomeBlend[,] biomeMap, float[,] heightMap, int chunkX, int chunkZ)

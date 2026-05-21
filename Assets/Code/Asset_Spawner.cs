@@ -8,6 +8,13 @@ public class Asset_Spawner : MonoBehaviour
 
     private float maxSlope = 1f; // Maximum slope allowed for spawning, calculated as the maximum height difference between a point and its 4 cardinal neighbors
 
+  
+    public void SetAssetSpawningSettings(int spawn_spacing, float max_slope)
+    {
+        spawnSpacing = spawn_spacing;
+        maxSlope = max_slope;
+    }
+    
     // Calculate the slope at a given point in the height map by comparing the height of the point to its 4 neighbors and returning the maximum height difference
     private float CalculateSlope(float[,] heightMap, int x, int z)
     {

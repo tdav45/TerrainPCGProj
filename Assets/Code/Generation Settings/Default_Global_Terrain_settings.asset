@@ -15,15 +15,17 @@ MonoBehaviour:
   sizeX: 128
   sizeZ: 128
   meshScale: 1
+  material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   octaves: 20
-  seed: 79
+  seed: 918
   baseFrequency: 1
   basePersistence: 0.5
   lacunarity: 2
-  material: {fileID: 2100000, guid: 6e884076cfe87934ebd96af0aa71df64, type: 2}
   biomeNoiseScale: 300
   biomeOctaves: 4
   biomePersistence: 0.5
   biomeLacunarity: 2
   biomeFrequency: 1
   biomeEdgeWidth: 0.06
+  spawnSpacing: 1
+  maxSlope: 1
