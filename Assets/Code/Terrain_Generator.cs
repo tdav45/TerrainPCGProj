@@ -69,6 +69,8 @@ public class Terrain_Generator : MonoBehaviour
     private Vector2[] octaveOffsets; // Offset seed for each octave, used to create variation in the noise
     private Vector2 biomeOffsetSeed; // Offset seed for the biome noise, used to create variation in the biome distribution
 
+    private Asset_Spawner assetSpawner; // Asset spawner reference, used to spawn assets on the terrain chunks
+
     #endregion
 
     #region BiomeNoise
@@ -226,7 +228,30 @@ public class Terrain_Generator : MonoBehaviour
 
     #endregion
 
+    #region Asset Spawning
+
+    private void AssignAssetSpawner()
+    {
+        if (assetSpawner == null)
+        {
+            assetSpawner = gameObject.AddComponent<Asset_Spawner>();
+        }
+    }
+
+    public void SpawnAssetsInChunk(Terrain_Chunk chunk, BiomeBlend[,] biomeMap, float[,] heightMap, int chunkX, int chunkZ)
+    {
+        if(assetSpawner != null)
+        {
+            assetSpawner.SpawnAssets(chunk, globalTerrainSettings, biomeMap, heightMap, chunkX, chunkZ);
+        }
+    }
+
+    #endregion
+
     #region Utility
+
+
+
     // Randomise the seed value
     public void RandomiseSeed()
     {
@@ -376,6 +401,11 @@ public class Terrain_Generator : MonoBehaviour
         if (isGenerating == false)
         {
             isGenerating = true;
+
+            if(useAssetSpawning)
+            {
+                AssignAssetSpawner();
+            }
 
             RemovePreviousGeneration();
 

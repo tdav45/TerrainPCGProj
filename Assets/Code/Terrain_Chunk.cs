@@ -25,8 +25,6 @@ public class Terrain_Chunk : MonoBehaviour
     private float[,] heightMap; // Height map of the chunk, used for asset spawning
     private BiomeBlend[,] biomeMap; // Biome map of the chunk, used for asset spawning
 
-    private Asset_Spawner assetSpawner; // Asset spawner reference
-
     // Assign mesh to the chunk, if it doesn't already have one
     private void AssignMesh()
     {
@@ -198,8 +196,6 @@ public class Terrain_Chunk : MonoBehaviour
         chunkX = x;
         chunkZ = z;
 
-        assetSpawner = gameObject.AddComponent<Asset_Spawner>();
-
         //Call generate mesh
         GenerateMesh();
 
@@ -219,7 +215,7 @@ public class Terrain_Chunk : MonoBehaviour
 
         if (spawnAssets)
         {
-            assetSpawner.SpawnAssets(this, terrainSettings, biomeMap, heightMap, chunkX, chunkZ);
+            terrainGenerator.SpawnAssetsInChunk(this, biomeMap, heightMap, chunkX, chunkZ);
         }
     }
 

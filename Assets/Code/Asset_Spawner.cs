@@ -95,9 +95,8 @@ public class Asset_Spawner : MonoBehaviour
 
                 BiomeBlend blend = biomeMap[x, z];
 
-                Biome_Settings biome = blend.blendValue < 0.5f
-                    ? blend.biomeA
-                    : blend.biomeB;
+                // Determine which biome is dominant at this point based on the blend value, and use that biome's settings for spawning
+                Biome_Settings biome = blend.blendValue < 0.5f ? blend.biomeA : blend.biomeB;
 
                 TrySpawnObject(
                     chunk,
