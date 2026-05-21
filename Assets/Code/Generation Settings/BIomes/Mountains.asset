@@ -19,25 +19,25 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 60
+  baseAmplitude: 25
   gradient:
     serializedVersion: 2
     key0: {r: 0.030774897, g: 0.1981132, b: 0, a: 1}
@@ -69,18 +69,18 @@ MonoBehaviour:
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   noiseScale: 4
-  lowerThreshold: 0
+  lowerThreshold: 0.2
   priority: 2
   order: 0.4
-  noiseThreshold: 0.6
+  noiseThreshold: 0.7
   spawnPrefabs:
   - {fileID: 4396241952185308633, guid: 3324fe12b2c9be64f8b6d81b40253fc7, type: 3}
   - {fileID: 5546181887698506422, guid: 65058a1305d50c041b1e6ab2c7180733, type: 3}
   - {fileID: 6996789656231951248, guid: c5e680738352b2e46ada92f8b7685a9c, type: 3}
   - {fileID: 2560457701353787104, guid: 09d956f47aa4998478686e27125056ba, type: 3}
   - {fileID: 3524742602163404321, guid: 07be10221ed3b9e4aac2b1394ca1ef7b, type: 3}
-  spawnThreshold: 0.8
+  spawnThreshold: 0.9
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
   thresholdStart: 0.6666667
-  thresholdEnd: 1
+  thresholdEnd: 0.8333333
