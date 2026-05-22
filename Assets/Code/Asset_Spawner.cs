@@ -64,30 +64,56 @@ public class Asset_Spawner : MonoBehaviour
             (worldX + biome.spawnNoiseOffset) * biome.spawnNoiseScale,
             (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale);*/
 
-        float spawnNoise = noise.GetNoise(sampleX, sampleZ);
-
-
-        if (spawnNoise < biome.spawnThreshold)
-            return;
 
 
         // Use a seeded random number generator to select a prefab to spawn, using the world coordinates as the seed to ensure consistent spawning across runs
         int hash = worldX.GetHashCode() ^ worldZ.GetHashCode();
         System.Random rng = new System.Random(hash);
         int prefabIndex = rng.Next(0, biome.spawnPrefabs.Length);
+      
+        
+        float spawnNoise = noise.GetNoise(sampleX, sampleZ);
+
+        float noiseValue = Mathf.InverseLerp(-1f, 1f, spawnNoise); // normalize noise
+
+        float probability = noiseValue * biome.spawnRarity;
+
+
+        if ((float)rng.NextDouble() > probability)
+            return;
+        
+
+        float clusterNoise = noise.GetNoise(worldX * 0.02f, worldZ * 0.02f);
+        if (clusterNoise < 0.2f)
+            return;
 
         GameObject prefab = biome.spawnPrefabs[prefabIndex];
-
+     
+      //  float worldY = terrainHeight * settings.sizeZ;
         Vector3 localPosition = new Vector3(localX, terrainHeight, localZ);
 
         Vector3 worldPosition = chunk.transform.TransformPoint(localPosition);
 
-        Instantiate(prefab, worldPosition, prefab.transform.rotation, chunk.transform);
+        var yRot = rng.Next(0, 360);  
+
+        var newRot = Quaternion.Euler(
+            prefab.transform.rotation.x, 
+            (yRot),
+            prefab.transform.rotation.z);
+
+        //Random scale
+        float scale = Mathf.Lerp(0.8f, 1.2f, (float)rng.NextDouble());
+
+
+
+        GameObject obj = Instantiate(prefab, worldPosition, newRot, chunk.transform);
+        obj.transform.localScale *= scale;
     }
 
     // Main function to spawn assets on a chunk
     public void SpawnAssets(
         Terrain_Chunk chunk,
+        Terrain_Generator generator,
         Global_Terrain_Settings settings,
         BiomeBlend[,] biomeMap,
         float[,] heightMap,
@@ -101,18 +127,34 @@ public class Asset_Spawner : MonoBehaviour
         {
             for (int x = 1; x < width; x += spawnSpacing)
             {
-                float terrainHeight = heightMap[x, z];
+                int hash =
+                 x.GetHashCode() ^
+                 z.GetHashCode() ^
+                 chunkX.GetHashCode() ^
+                 chunkZ.GetHashCode();
 
+                System.Random rng = new System.Random(hash);
+
+                float offsetX = ((float)rng.NextDouble() - 0.5f) * spawnSpacing * 0.85f;
+
+                float offsetZ = ((float)rng.NextDouble() - 0.5f) * spawnSpacing * 0.85f;
+
+                float sampleX = x + offsetX;
+                float sampleZ = z + offsetZ;
+
+                int ix = Mathf.Clamp(Mathf.RoundToInt(sampleX), 1, width - 2);
+
+                int iz = Mathf.Clamp(Mathf.RoundToInt(sampleZ), 1, height - 2);
+
+                float terrainHeight = heightMap[ix, iz];
                 if (terrainHeight <= 0)
                     continue;
 
-                float slope = CalculateSlope(heightMap, x, z);
-
+                float slope = CalculateSlope(heightMap, ix, iz);
                 if (slope > maxSlope)
                     continue;
 
-                BiomeBlend blend = biomeMap[x, z];
-
+                BiomeBlend blend = biomeMap[ix, iz];
                 // Determine which biome is dominant at this point based on the blend value, and use that biome's settings for spawning
                 Biome_Settings biome = blend.blendValue < 0.5f ? blend.biomeA : blend.biomeB;
 
@@ -120,8 +162,8 @@ public class Asset_Spawner : MonoBehaviour
                     chunk,
                     biome,
                     terrainHeight,
-                    x,
-                    z,
+                    ix,
+                    iz,
                     chunkX,
                     chunkZ,
                     settings);

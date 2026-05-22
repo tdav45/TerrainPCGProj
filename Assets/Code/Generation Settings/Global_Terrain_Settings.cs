@@ -5,7 +5,8 @@ using UnityEngine;
 public class Global_Terrain_Settings : ScriptableObject
 {
     [Header("General Settings")]
-    public int sizeX, sizeZ; // Size of terrain along each axis
+    public int sizeX;// Size of terrain along the x axis
+    public int sizeZ; // Size of terrain along the z axis
     public int meshScale; // Scale multiplier
     public Material material; // Material used for the terrain
     [Header("Terrain Mesh Noise Settings")]

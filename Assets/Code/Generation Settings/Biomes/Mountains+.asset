@@ -77,5 +77,6 @@ MonoBehaviour:
   spawnThreshold: 0.7
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
+  spawnRarity: 0.01
   thresholdStart: 0.8333333
   thresholdEnd: 1

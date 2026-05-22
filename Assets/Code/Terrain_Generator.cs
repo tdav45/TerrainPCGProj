@@ -263,7 +263,7 @@ public class Terrain_Generator : MonoBehaviour
     {
         if(assetSpawner != null)
         {
-            assetSpawner.SpawnAssets(chunk, globalTerrainSettings, biomeMap, heightMap, chunkX, chunkZ);
+            assetSpawner.SpawnAssets(chunk, this, globalTerrainSettings, biomeMap, heightMap, chunkX, chunkZ);
         }
     }
 

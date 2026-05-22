@@ -42,7 +42,7 @@ public class Biome_Settings : ScriptableObject
     public float spawnThreshold = 0.7f; // Threshold value used in the noise to determine whether to spawn an object at a point
     public float spawnNoiseScale = 0.05f; // Scale of the noise used to determine where to spawn objects
     public float spawnNoiseOffset = 1000f; // Offset of the noise used to determine where to spawn objects
-
+    public float spawnRarity = 0.2f; //How rare spawning items is in the biome
 
     [HideInInspector]
     public float thresholdStart = 0; // Used in calculating the noise threshold

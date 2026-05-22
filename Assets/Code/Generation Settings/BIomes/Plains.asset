@@ -83,11 +83,12 @@ MonoBehaviour:
   order: 0.2
   noiseThreshold: 0.3
   spawnPrefabs:
-  - {fileID: 4396241952185308633, guid: 3324fe12b2c9be64f8b6d81b40253fc7, type: 3}
-  - {fileID: 5546181887698506422, guid: 65058a1305d50c041b1e6ab2c7180733, type: 3}
-  - {fileID: 6996789656231951248, guid: c5e680738352b2e46ada92f8b7685a9c, type: 3}
-  spawnThreshold: 0.6
+  - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
+  - {fileID: 5999457002820530571, guid: 99b8db5cfdfd72b43b4acadf60380ffc, type: 3}
+  - {fileID: 5999457002820530571, guid: 77bcea3cbbc80bb4099d9ed197fac576, type: 3}
+  spawnThreshold: 0.5
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
+  spawnRarity: 1
   thresholdStart: 0.33333334
   thresholdEnd: 0.5
