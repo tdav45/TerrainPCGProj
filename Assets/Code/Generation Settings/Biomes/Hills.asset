@@ -37,7 +37,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 4
+  baseAmplitude: 10
   gradient:
     serializedVersion: 2
     key0: {r: 0.04883463, g: 0.31132078, b: 0, a: 1}
@@ -68,11 +68,11 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  noiseScale: 1
+  noiseScale: 9
   lowerThreshold: 0
   priority: 2
-  order: 0.3
-  noiseThreshold: 0.5
+  order: 0.4
+  noiseThreshold: 0.3
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
   - {fileID: 5999457002820530571, guid: 723186bdc2bb6614fbc951be36633229, type: 3}
@@ -81,5 +81,5 @@ MonoBehaviour:
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
   spawnRarity: 0.05
-  thresholdStart: 0.5
+  thresholdStart: 0.33333334
   thresholdEnd: 0.6666667

@@ -80,7 +80,7 @@ MonoBehaviour:
   noiseScale: 1
   lowerThreshold: 0
   priority: 2
-  order: 0.2
+  order: 0.3
   noiseThreshold: 0.3
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
@@ -91,4 +91,4 @@ MonoBehaviour:
   spawnNoiseOffset: 1000
   spawnRarity: 2
   thresholdStart: 0.33333334
-  thresholdEnd: 0.5
+  thresholdEnd: 0.41666666
