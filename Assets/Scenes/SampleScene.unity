@@ -169,9 +169,9 @@ MonoBehaviour:
   terrainHolder: {fileID: 1131858493}
   globalTerrainSettings: {fileID: 11400000, guid: 2f996631e1d64ff45984162b3bb8948d, type: 2}
   biomePool:
-  - {fileID: 11400000, guid: c46435744a3c6094aa6de991eec4f433, type: 2}
+  - {fileID: 11400000, guid: 1b9050546bd283b42a795759aa197307, type: 2}
   - {fileID: 11400000, guid: 2ae4b31d1e22f184db5b1de153b8330e, type: 2}
-  - {fileID: 11400000, guid: 7d0da2c0d08cfba4bbeb4d691a0a86c6, type: 2}
+  - {fileID: 11400000, guid: b5c98d77f7733c64db1e39b7d94d3521, type: 2}
   useAllBiomes: 1
   isRandomSeed: 1
   useAssetSpawning: 1

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
-  m_Name: Plains
+  m_Name: Forest
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
   biomeName: 1
   heightCurve:
@@ -89,6 +89,6 @@ MonoBehaviour:
   spawnThreshold: 0.5
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
-  spawnRarity: 0.03
+  spawnRarity: 2
   thresholdStart: 0.33333334
   thresholdEnd: 0.5

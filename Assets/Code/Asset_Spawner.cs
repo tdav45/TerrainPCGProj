@@ -123,9 +123,9 @@ public class Asset_Spawner : MonoBehaviour
         int height = settings.sizeZ;
 
         // Loop through the height map at intervals of spawnSpacing to check potential spawn points
-        for (int z = 1; z < height; z += spawnSpacing)
+        for (int z = 0; z < height; z += spawnSpacing)
         {
-            for (int x = 1; x < width; x += spawnSpacing)
+            for (int x = 0; x < width; x += spawnSpacing)
             {
                 int hash =
                  x.GetHashCode() ^
@@ -142,9 +142,8 @@ public class Asset_Spawner : MonoBehaviour
                 float sampleX = x + offsetX;
                 float sampleZ = z + offsetZ;
 
-                int ix = Mathf.Clamp(Mathf.RoundToInt(sampleX), 1, width - 2);
-
-                int iz = Mathf.Clamp(Mathf.RoundToInt(sampleZ), 1, height - 2);
+                int ix = Mathf.Clamp(Mathf.RoundToInt(sampleX), 1, width - 1);
+                int iz = Mathf.Clamp(Mathf.RoundToInt(sampleZ), 1, height - 1);
 
                 float terrainHeight = heightMap[ix, iz];
                 if (terrainHeight <= 0)
