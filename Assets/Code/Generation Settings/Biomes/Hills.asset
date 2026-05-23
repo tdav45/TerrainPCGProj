@@ -73,7 +73,7 @@ MonoBehaviour:
   priority: 6
   biomeSizeMultiplier: 2
   order: 0.4
-  noiseThreshold: 0
+  noiseThreshold: 0.5
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
   - {fileID: 5999457002820530571, guid: 723186bdc2bb6614fbc951be36633229, type: 3}
@@ -81,6 +81,6 @@ MonoBehaviour:
   spawnThreshold: 0.8
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
-  spawnRarity: 0.05
-  thresholdStart: 0
-  thresholdEnd: 0.25
+  spawnRarity: 0.02
+  thresholdStart: 0.44444445
+  thresholdEnd: 0.6666667
