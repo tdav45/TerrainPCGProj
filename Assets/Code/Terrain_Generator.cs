@@ -302,40 +302,43 @@ public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     // Remove all previously generated terrain chunks
     public void RemovePreviousGeneration()
     {
-        if (generatedTerrainChunks != null)
+        if (!isGenerating)
         {
-            if (generatedTerrainChunks.Count > 0)
+            if (generatedTerrainChunks != null)
             {
-                foreach (GameObject terrain in generatedTerrainChunks)
+                if (generatedTerrainChunks.Count > 0)
                 {
-                    DestroyImmediate(terrain);
+                    foreach (GameObject terrain in generatedTerrainChunks)
+                    {
+                        DestroyImmediate(terrain);
+                    }
+                }
+
+                else
+                {
+                    if (terrainHolder.transform.childCount > 0)
+                    {
+                        List<GameObject> oldChunks = new List<GameObject>();
+
+                        foreach (Transform child in terrainHolder.transform)
+                        {
+                            oldChunks.Add(child.gameObject);
+
+                        }
+
+                        foreach (GameObject obj in oldChunks)
+                        {
+                            DestroyImmediate(obj.gameObject);
+                        }
+                    }
                 }
             }
 
-            else
-            {
-                if (terrainHolder.transform.childCount > 0)
-                {
-                    List<GameObject> oldChunks = new List<GameObject>(); 
-                    
-                    foreach (Transform child in terrainHolder.transform)
-                    {
-                        oldChunks.Add(child.gameObject);
-                       
-                    }
 
-                    foreach (GameObject obj in oldChunks)
-                    {
-                        DestroyImmediate(obj.gameObject);
-                    }
-                }
-            }
+
+            generatedTerrainChunks = new List<GameObject>();
+
         }
-
-     
-
-        generatedTerrainChunks = new List<GameObject>();
-
     }
 
     #endregion
@@ -438,6 +441,8 @@ public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     // GENERATE TERRAIN (ENTRY POINT) //
     public void CreateNewTerrain()
     {
+        RemovePreviousGeneration();
+
         if (!isGenerating)
             StartCoroutine(GenerateTerrain());
         else
@@ -450,8 +455,6 @@ public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
         isGenerating = true;
 
         if (useAssetSpawning) { AssignAssetSpawner(); }
-
-        RemovePreviousGeneration();
 
         if (isRandomSeed) { RandomiseSeed(); }
 

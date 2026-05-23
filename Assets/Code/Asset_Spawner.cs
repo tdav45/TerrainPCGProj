@@ -122,51 +122,42 @@ public class Asset_Spawner : MonoBehaviour
         int width = settings.sizeX;
         int height = settings.sizeZ;
 
-        // Loop through the height map at intervals of spawnSpacing to check potential spawn points
-        for (int z = 0; z < height; z += spawnSpacing)
+        int attempts = (width * height) / (spawnSpacing * spawnSpacing);
+
+
+        // Use Noise for asset spawning
+        for (int i = 0; i < attempts; i++)
         {
-            for (int x = 0; x < width; x += spawnSpacing)
-            {
-                int hash =
-                 x.GetHashCode() ^
-                 z.GetHashCode() ^
-                 chunkX.GetHashCode() ^
-                 chunkZ.GetHashCode();
+            float px = Mathf.PerlinNoise(i * 0.37f, chunkX * 0.123f) * width;
+            float pz = Mathf.PerlinNoise(i * 0.51f, chunkZ * 0.271f) * height;
 
-                System.Random rng = new System.Random(hash);
+            int ix = Mathf.Clamp(Mathf.RoundToInt(px), 1, width - 1);
+            int iz = Mathf.Clamp(Mathf.RoundToInt(pz), 1, height - 1);
 
-                float offsetX = ((float)rng.NextDouble() - 0.5f) * spawnSpacing * 0.85f;
+            float terrainHeight = heightMap[ix, iz];
+            if (terrainHeight <= 0)
+                continue;
 
-                float offsetZ = ((float)rng.NextDouble() - 0.5f) * spawnSpacing * 0.85f;
+            float slope = CalculateSlope(heightMap, ix, iz);
+            if (slope > maxSlope)
+                continue;
 
-                float sampleX = x + offsetX;
-                float sampleZ = z + offsetZ;
+            BiomeBlend blend = biomeMap[ix, iz];
+            Biome_Settings biome = blend.blendValue < 0.5f ? blend.biomeA : blend.biomeB;
 
-                int ix = Mathf.Clamp(Mathf.RoundToInt(sampleX), 1, width - 1);
-                int iz = Mathf.Clamp(Mathf.RoundToInt(sampleZ), 1, height - 1);
+            // Unique hash so RNG is stable per position (deterministic, no lines)
+            int hash = (ix * 73856093) ^ (iz * 19349663) ^ (chunkX * 83492791) ^ (chunkZ * 297657976);
+            System.Random rng = new System.Random(hash);
 
-                float terrainHeight = heightMap[ix, iz];
-                if (terrainHeight <= 0)
-                    continue;
-
-                float slope = CalculateSlope(heightMap, ix, iz);
-                if (slope > maxSlope)
-                    continue;
-
-                BiomeBlend blend = biomeMap[ix, iz];
-                // Determine which biome is dominant at this point based on the blend value, and use that biome's settings for spawning
-                Biome_Settings biome = blend.blendValue < 0.5f ? blend.biomeA : blend.biomeB;
-
-                TrySpawnObject(
-                    chunk,
-                    biome,
-                    terrainHeight,
-                    ix,
-                    iz,
-                    chunkX,
-                    chunkZ,
-                    settings);
-            }
+            TrySpawnObject(
+                chunk,
+                biome,
+                terrainHeight,
+                ix,
+                iz,
+                chunkX,
+                chunkZ,
+                settings);
         }
     }
 
