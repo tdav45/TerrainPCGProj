@@ -201,12 +201,11 @@ public class Terrain_Generator : MonoBehaviour
             float sampleX = x / biome.noiseScale * frequency + octaveOffsets[i].x;
 
 
-        /*      FastNoiseLite noise = new FastNoiseLite();
-              noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-              noiseValue = noise.GetNoise(sampleX, sampleZ);*/
+          /*  FastNoiseLite noise = new FastNoiseLite();
+            noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+            noiseValue = noise.GetNoise(sampleX, sampleZ);*/
 
-
-             noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
+            noiseValue = Mathf.PerlinNoise(sampleZ, sampleX) * 2 - 1;
 
 
 

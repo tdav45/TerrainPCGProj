@@ -12,33 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95aa1c9e8ef015c4e80161f240313c9b, type: 3}
   m_Name: Forest
   m_EditorClassIdentifier: Assembly-CSharp::Biome_Settings
-  biomeName: 1
+  biomeName: 2
   heightCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.9170046
-      value: 0.40020084
-      inSlope: 1.5340095
-      outSlope: 1.5340095
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.0916748
-      value: 0.70000076
-      inSlope: 2
-      outSlope: 2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -77,11 +68,11 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  noiseScale: 1
+  noiseScale: 60
   lowerThreshold: 0
   priority: 2
   order: 0.3
-  noiseThreshold: 0.3
+  noiseThreshold: 0.5
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
   - {fileID: 5999457002820530571, guid: 99b8db5cfdfd72b43b4acadf60380ffc, type: 3}
@@ -90,5 +81,5 @@ MonoBehaviour:
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
   spawnRarity: 2
-  thresholdStart: 0.33333334
-  thresholdEnd: 0.41666666
+  thresholdStart: 0.5
+  thresholdEnd: 0.6666667

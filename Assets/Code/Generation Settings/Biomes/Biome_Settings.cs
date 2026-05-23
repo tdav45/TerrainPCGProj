@@ -5,6 +5,7 @@ public enum BiomeType
 {
     Mountains,
     Plains,
+    Forest,
     Ocean,
     Desert,
     Hills,
