@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -432,51 +433,50 @@ public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
 
     #region New Terrain Generation
 
+
+
     // GENERATE TERRAIN (ENTRY POINT) //
     public void CreateNewTerrain()
     {
-        if (isGenerating == false)
-        {
-            isGenerating = true;
-
-            if(useAssetSpawning)
-            {
-                AssignAssetSpawner();
-            }
-
-            RemovePreviousGeneration();
-
-
-            if (isRandomSeed)
-            {
-                RandomiseSeed();
-            }
-
-            SetupBiomes();
-
-            // Get the offset seeds for the terrain noise and biome noise
-            octaveOffsets = GetOffsetSeed();
-            biomeOffsetSeed = GenerateBiomeOffsetSeed();
-
-            //Generate grid
-            for (int i = 0; i < gridSize; i++)
-            {
-                for (int j = 0; j < gridSize; j++)
-                {
-                    NewChunk(i, j);
-        
-                }
-            }
-
-            isGenerating = false;
-        }
+        if (!isGenerating)
+            StartCoroutine(GenerateTerrain());
         else
-        {
             Debug.LogError("Already Generating");
-        }
-
 
     }
+
+    private IEnumerator GenerateTerrain()
+    {
+        isGenerating = true;
+
+        if (useAssetSpawning) { AssignAssetSpawner(); }
+
+        RemovePreviousGeneration();
+
+        if (isRandomSeed) { RandomiseSeed(); }
+
+        SetupBiomes();
+
+        octaveOffsets = GetOffsetSeed();
+        biomeOffsetSeed = GenerateBiomeOffsetSeed();
+
+        int total = gridSize * gridSize;
+        int count = 0;
+
+        for (int i = 0; i < gridSize; i++)
+        {
+            for (int j = 0; j < gridSize; j++)
+            {
+                NewChunk(i, j);
+                count++;
+
+                yield return null;
+            }
+        }
+
+        isGenerating = false;
+    }
+
 
     // Generate a new terrain chunk at the given coordinates
     private void NewChunk(int x, int z)

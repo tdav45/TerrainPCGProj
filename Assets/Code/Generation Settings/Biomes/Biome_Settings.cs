@@ -33,7 +33,7 @@ public class Biome_Settings : ScriptableObject
     public float noiseScale; // Scale of the noise applied to the terrain
     public float lowerThreshold; // Height threshold, any height lower will be set to 0
     public int priority = 1; // Priority of the biome, higher priority will blend over lower priority biomes
-    public float biomeSizeMultiplier = 1.0f;
+    public float biomeSizeMultiplier = 1.0f; // Size of the biome compared to others
     [Range (0, 1f)]
     public float order = 0; // Order of the biome, dictating which biomes blends with which
     public float noiseThreshold = 0; // Threshold value used in the noise to determine which biome is used at a point. Not hidden in order for debugging
