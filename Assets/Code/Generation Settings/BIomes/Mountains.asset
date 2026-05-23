@@ -19,43 +19,52 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1.3883078
-      outSlope: 1.3883078
+      inSlope: 0.3333333
+      outSlope: 0.3333333
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.50085783
-      value: 0.69534487
-      inSlope: 0.99179935
-      outSlope: 0.99179935
-      tangentMode: 136
+      time: 0.6
+      value: 0.2
+      inSlope: 1.1666669
+      outSlope: 1.1666669
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.6351579
-      value: 0.85283214
-      inSlope: 0.61035746
-      outSlope: 0.61035746
-      tangentMode: 136
+      time: 0.75
+      value: 0.5
+      inSlope: 4.333334
+      outSlope: 4.333334
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: -0.07178181
-      outSlope: -0.07178181
-      tangentMode: 0
+      time: 0.9
+      value: 1.5
+      inSlope: 4.166667
+      outSlope: 4.166667
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0.09091469
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.2
+      value: 2
+      inSlope: 1.6666663
+      outSlope: 1.6666663
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 80
+  baseAmplitude: 50
   gradient:
     serializedVersion: 2
     key0: {r: 0.030774897, g: 0.1981132, b: 0, a: 1}
@@ -86,16 +95,17 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  noiseScale: 150
+  noiseScale: 80
   lowerThreshold: 0
-  priority: 3
+  priority: 10
+  biomeSizeMultiplier: 3
   order: 0.5
-  noiseThreshold: 0.6
+  noiseThreshold: 0.75
   spawnPrefabs:
   - {fileID: 3524742602163404321, guid: 07be10221ed3b9e4aac2b1394ca1ef7b, type: 3}
   spawnThreshold: 0.9
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
   spawnRarity: 0.01
-  thresholdStart: 0.5
+  thresholdStart: 0.625
   thresholdEnd: 1

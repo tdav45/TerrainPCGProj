@@ -77,13 +77,19 @@ public class Terrain_Chunk : MonoBehaviour
                 float noiseHeightA = terrainGenerator.GenerateNoiseHeight(worldX, worldZ, biomeBlend.biomeA);
                 float noiseHeightB = terrainGenerator.GenerateNoiseHeight(worldX, worldZ, biomeBlend.biomeB);
 
-                float blendedHeight = Mathf.Lerp(noiseHeightA, noiseHeightB, biomeBlend.blendValue);
+                //Square blend height so that mountains are not dragged down as much
+                float squaredHeightBlend = biomeBlend.blendValue * biomeBlend.blendValue;
+
+                float blendedHeight = Mathf.Lerp(noiseHeightA, noiseHeightB, squaredHeightBlend);
+
                 float threshold = Mathf.Lerp(biomeBlend.biomeA.lowerThreshold, biomeBlend.biomeB.lowerThreshold, biomeBlend.blendValue);
 
-                // Set height to 0 if it's below the threshold, creating flat areas in the terrain
+                // Smooth terrain towards 0 if below threshold
+               
                 if (blendedHeight <= threshold)
                 {
-                    blendedHeight = 0;
+                    float t = Mathf.InverseLerp(threshold - 1f, threshold, blendedHeight);
+                    blendedHeight *= t;
                 }
 
                 heightMap[x, z] = blendedHeight;

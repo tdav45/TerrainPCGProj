@@ -171,7 +171,7 @@ MonoBehaviour:
   biomePool:
   - {fileID: 11400000, guid: c46435744a3c6094aa6de991eec4f433, type: 2}
   - {fileID: 11400000, guid: 2ae4b31d1e22f184db5b1de153b8330e, type: 2}
-  useAllBiomes: 0
+  useAllBiomes: 1
   isRandomSeed: 1
   useAssetSpawning: 1
 --- !u!114 &24418427

@@ -46,7 +46,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 6
+  baseAmplitude: 4
   gradient:
     serializedVersion: 2
     key0: {r: 0.04883463, g: 0.31132078, b: 0, a: 1}
@@ -77,11 +77,12 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  noiseScale: 80
+  noiseScale: 60
   lowerThreshold: 0
-  priority: 2
+  priority: 3
+  biomeSizeMultiplier: 1
   order: 0.2
-  noiseThreshold: 0.3
+  noiseThreshold: 0.22222224
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
   - {fileID: 5999457002820530571, guid: 99b8db5cfdfd72b43b4acadf60380ffc, type: 3}
@@ -89,6 +90,6 @@ MonoBehaviour:
   spawnThreshold: 0.5
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
-  spawnRarity: 0.03
-  thresholdStart: 0.33333334
-  thresholdEnd: 0.5
+  spawnRarity: 0.02
+  thresholdStart: 0.22222222
+  thresholdEnd: 0.33333334

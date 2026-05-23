@@ -41,7 +41,7 @@ public class Terrain_Generator_Editor : Editor
 public class Terrain_Generator : MonoBehaviour
 {
     #region Variables
-    [SerializeField] 
+    [SerializeField]
     private GameObject terrainChunkPrefab; // Prefab for the terrain chunk, with the necessary components attached
     [SerializeField]
     [Range(1, 16)]
@@ -52,7 +52,7 @@ public class Terrain_Generator : MonoBehaviour
     private Global_Terrain_Settings globalTerrainSettings; //Global settings that apply to all chunks/biomes
     [SerializeField]
     private Biome_Settings[] biomePool; // Array of biomes to randomly select from when generating terrain
-    
+
     // Booleans for generation
     [SerializeField]
     private bool useAllBiomes; // Whether to use all biomes found in the Biomes folder, or just the ones in the biomePool array
@@ -86,13 +86,13 @@ public class Terrain_Generator : MonoBehaviour
         for (int i = 0; i < globalTerrainSettings.biomeOctaves; i++)
         {
             // Calculate the sample position for the noise, using the world position, biome noise scale, frequency, and biome offset seed
-            float sampleX = worldX / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.x;
+            float sampleX = worldX / (globalTerrainSettings.biomeNoiseScale) * frequency + biomeOffsetSeed.x;
             float sampleZ = worldZ / globalTerrainSettings.biomeNoiseScale * frequency + biomeOffsetSeed.y;
 
 
             FastNoiseLite noise = new FastNoiseLite();
             noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-            
+
             biomeNoise += noise.GetNoise(sampleX, sampleZ) * amplitude;
 
             maxPossible += amplitude;
@@ -102,10 +102,26 @@ public class Terrain_Generator : MonoBehaviour
         }
 
         // Normalize the biome noise value to be between 0 and 1
-        return biomeNoise / maxPossible;
+        biomeNoise /= maxPossible;
+
+        // Applies another layer of noise for "continents"
+        FastNoiseLite continent = new FastNoiseLite();
+        continent.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+
+        float cX = worldX / 2000f;
+        float cZ = worldZ / 2000f;
+
+        float continentNoise = (continent.GetNoise(cX, cZ) + 1f) * 0.5f; // normalize 0–1
+
+        // Blend continent noise with biome noise
+        biomeNoise = Mathf.Lerp(biomeNoise, biomeNoise * continentNoise, 0.1f);
+
+        return biomeNoise;
     }
-    // Get the biomes to blend between and the blend value at a given world position, used to determine the biome to use at that point
-    public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
+
+
+// Get the biomes to blend between and the blend value at a given world position, used to determine the biome to use at that point
+public BiomeBlend GetBiomeBlend(float worldX, float worldZ)
     {
         float biomeNoise = GetBiomeNoise(worldX, worldZ);
 
@@ -358,7 +374,8 @@ public class Terrain_Generator : MonoBehaviour
             foreach (var biome in group)
             {
                 // Calculate the slice of the noise range that this biome should occupy based on its priority
-                float slice = biome.priority / totalPriority;
+                float slice = (biome.priority * biome.biomeSizeMultiplier) / totalPriority;
+
 
                 biome.thresholdStart = current;
                 biome.thresholdEnd = current + slice;
@@ -376,7 +393,9 @@ public class Terrain_Generator : MonoBehaviour
             biome.thresholdEnd /= current;
 
             biome.noiseThreshold = (biome.thresholdStart + biome.thresholdEnd) * 0.5f;
-            biome.noiseThreshold = Mathf.Round(biome.noiseThreshold * 10) / 10;
+            // biome.noiseThreshold = Mathf.Round(biome.noiseThreshold * 10) / 10;
+            biome.noiseThreshold = (biome.thresholdStart + biome.thresholdEnd) * 0.5f;
+
         }
 
         float minThreshold = allBiomes.Min(b => b.noiseThreshold);

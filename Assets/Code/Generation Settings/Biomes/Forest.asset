@@ -37,20 +37,20 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  baseAmplitude: 6
+  baseAmplitude: 8
   gradient:
     serializedVersion: 2
-    key0: {r: 0.04883463, g: 0.31132078, b: 0, a: 1}
-    key1: {r: 0.05882353, g: 0.31132078, b: 0, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
+    key0: {r: 0.081568174, g: 0.122641504, b: 0.088119335, a: 1}
+    key1: {r: 0.04883463, g: 0.3529412, b: 0, a: 1}
+    key2: {r: 0.05882353, g: 0.31132078, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 65535
-    ctime2: 0
+    ctime1: 4241
+    ctime2: 65535
     ctime3: 0
     ctime4: 0
     ctime5: 0
@@ -66,13 +66,14 @@ MonoBehaviour:
     atime7: 0
     m_Mode: 0
     m_ColorSpace: -1
-    m_NumColorKeys: 2
+    m_NumColorKeys: 3
     m_NumAlphaKeys: 2
-  noiseScale: 60
+  noiseScale: 40
   lowerThreshold: 0
-  priority: 2
+  priority: 4
+  biomeSizeMultiplier: 1
   order: 0.3
-  noiseThreshold: 0.5
+  noiseThreshold: 0.33333334
   spawnPrefabs:
   - {fileID: 5999457002820530571, guid: 2f8d46dc502bff64ca9d6cde6e5164b0, type: 3}
   - {fileID: 5999457002820530571, guid: 99b8db5cfdfd72b43b4acadf60380ffc, type: 3}
@@ -81,5 +82,5 @@ MonoBehaviour:
   spawnNoiseScale: 0.02
   spawnNoiseOffset: 1000
   spawnRarity: 2
-  thresholdStart: 0.5
-  thresholdEnd: 0.6666667
+  thresholdStart: 0.33333334
+  thresholdEnd: 0.44444445
