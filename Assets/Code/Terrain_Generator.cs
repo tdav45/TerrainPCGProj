@@ -42,6 +42,7 @@ public class Terrain_Generator_Editor : Editor
 public class Terrain_Generator : MonoBehaviour
 {
     #region Variables
+    [Header("Terrain General Settings")]
     [SerializeField]
     private GameObject terrainChunkPrefab; // Prefab for the terrain chunk, with the necessary components attached
     [SerializeField]
@@ -55,10 +56,11 @@ public class Terrain_Generator : MonoBehaviour
     private Biome_Settings[] biomePool; // Array of biomes to randomly select from when generating terrain
 
     // Booleans for generation
+    [Header("Generation Booleans")]
     [SerializeField]
-    private bool useAllBiomes; // Whether to use all biomes found in the Biomes folder, or just the ones in the biomePool array
+    private bool useAllBiomes = true; // Whether to use all biomes found in the Biomes folder, or just the ones in the biomePool array
     [SerializeField]
-    private bool isRandomSeed; // Whether to randomise the seed value for each generation, or use the previous seed
+    private bool isRandomSeed = true; // Whether to randomise the seed value for each generation, or use the previous seed
     [SerializeField]
     private bool useAssetSpawning = false; // Whether to spawn assets on the terrain
 

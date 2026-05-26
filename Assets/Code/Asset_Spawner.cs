@@ -8,7 +8,7 @@ public class Asset_Spawner : MonoBehaviour
 
     private float maxSlope = 1f; // Maximum slope allowed for spawning, calculated as the maximum height difference between a point and its 4 cardinal neighbors
 
-  
+    // Set the asset spawning settings, called from the world generator when creating the chunk
     public void SetAssetSpawningSettings(int spawn_spacing, float max_slope)
     {
         spawnSpacing = spawn_spacing;
@@ -59,26 +59,18 @@ public class Asset_Spawner : MonoBehaviour
         // Sample the biome noise at this point to determine the biome distribution, using the world coordinates and the biome's spawn noise settings
         float sampleX = (worldX + biome.spawnNoiseOffset) * biome.spawnNoiseScale;
         float sampleZ = (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale;   
-       
-/*        float spawnNoise = Mathf.PerlinNoise(
-            (worldX + biome.spawnNoiseOffset) * biome.spawnNoiseScale,
-            (worldZ + biome.spawnNoiseOffset) * biome.spawnNoiseScale);*/
-
-
 
         // Use a seeded random number generator to select a prefab to spawn, using the world coordinates as the seed to ensure consistent spawning across runs
         int hash = worldX.GetHashCode() ^ worldZ.GetHashCode();
         System.Random rng = new System.Random(hash);
         int prefabIndex = rng.Next(0, biome.spawnPrefabs.Length);
-      
-        
+
+        // Sample the noise to determine whether to spawn an object at this point, using the biome's spawn rarity to determine the probability of spawning
         float spawnNoise = noise.GetNoise(sampleX, sampleZ);
-
         float noiseValue = Mathf.InverseLerp(-1f, 1f, spawnNoise); // normalize noise
-
         float probability = noiseValue * biome.spawnRarity;
 
-
+        // If the random value is greater than the probability, do not spawn an object at this point
         if ((float)rng.NextDouble() > probability)
             return;
         
@@ -110,6 +102,7 @@ public class Asset_Spawner : MonoBehaviour
         obj.transform.localScale *= scale;
     }
 
+
     // Main function to spawn assets on a chunk
     public void SpawnAssets(
         Terrain_Chunk chunk,
@@ -128,9 +121,11 @@ public class Asset_Spawner : MonoBehaviour
         // Use Noise for asset spawning
         for (int i = 0; i < attempts; i++)
         {
+            // Sample random points in the chunk using Perlin noise, this ensures that the distribution of points is consistent across runs
             float px = Mathf.PerlinNoise(i * 0.37f, chunkX * 0.123f) * width;
             float pz = Mathf.PerlinNoise(i * 0.51f, chunkZ * 0.271f) * height;
 
+            // Convert the sampled points to integer coordinates, clamping them to ensure they are within the bounds of the height map and biome map
             int ix = Mathf.Clamp(Mathf.RoundToInt(px), 1, width - 1);
             int iz = Mathf.Clamp(Mathf.RoundToInt(pz), 1, height - 1);
 
